@@ -7,10 +7,11 @@ void setupCar() {
 
 void drawCar() {
   pushMatrix();
-    translate(0, 150, 0); 
+    translate(0, 0, 0); 
+    scale(10.);
     
     rotateX(PI); 
-    rotateY(PI); 
+    rotateY(PI);
     
     shape(carModel); 
   popMatrix();

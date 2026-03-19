@@ -3,7 +3,7 @@ PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 PShape Front, Back, Left, Right, Bottom, Top;
 
 void setup() {
-  size(600, 600, P3D);
+  size(800, 800, P3D);
   cube = loadImage("C:\\Users\\frede\\Desktop\\Code\\UPS\\IGSD\\Projet\\projetIGSD\\resources\\desert.png");
 
   int w = cube.width / 4;
@@ -17,19 +17,23 @@ void setup() {
   texBottom = cube.get(w, 2 * h, w, h);
   
   setupCar();
+  setupCircuit();
   noStroke();
 }
 
 void draw() {
   background(0);
   
-  camera(70.0, 35.0, 120.0, 50.0, 50.0, 0.0, 0.0, 1.0, 0.0);
+  camera(width/2, height/2, 100, width/2, height/2, 0, 0, 1, 0);
+  translate(width/2, height/2);
   
-  // float angleY = frameCount * 0.01; 
-  // xrotateY(angleY);
-  
+  float angleY = frameCount * 0.01; 
+  rotateY(angleY);
+    
   drawCube(2000);
+  translate(0, 25, 0);  
   drawCar();
+  drawCircuit();
 }
 
 void drawCube(float s) {
