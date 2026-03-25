@@ -4,7 +4,7 @@ PShape Front, Back, Left, Right, Bottom, Top;
 
 void setup() {
   size(800, 800, P3D);
-  cube = loadImage("C:\\Users\\frede\\Desktop\\Code\\UPS\\IGSD\\Projet\\projetIGSD\\resources\\desert.png");
+  cube = loadImage("..\\resources\\desert.png");
 
   int w = cube.width / 4;
   int h = cube.height / 3;
@@ -18,6 +18,7 @@ void setup() {
   
   setupCar();
   setupCircuit();
+
   noStroke();
 }
 
@@ -27,16 +28,18 @@ void draw() {
   camera(width/2, height/2, 100, width/2, height/2, 0, 0, 1, 0);
   translate(width/2, height/2);
   
-  float angleY = frameCount * 0.01; 
+  float angleY = frameCount * 0.01;
   rotateY(angleY);
-    
+
   drawCube(2000);
-  translate(0, 25, 0);  
+  translate(0, 25, 0);
+
   drawCar();
   drawCircuit();
 }
 
 void drawCube(float s) {
+  noStroke();
   float d = s / 2;
 
   // Front
