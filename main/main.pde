@@ -26,6 +26,7 @@ void draw() {
   background(0);
   
   camera(width/2, height/2, 100, width/2, height/2, 0, 0, 1, 0);
+  perspective(PI/3, float(width)/float(height), 1, 10000);
   translate(width/2, height/2);
   
   float angleY = frameCount * 0.01;

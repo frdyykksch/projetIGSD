@@ -40,7 +40,7 @@ void drawCircuit() {
     translate(pStart.x, pStart.y);
     rotateZ(angle);
 
-    for(int k = 0; k < dist; k += tileHeight) {
+    for(int k = 0; k < dist; k += tileWidth) {
       pushMatrix();
 
       translate(k, 0);
@@ -54,9 +54,10 @@ void drawCircuit() {
 void drawTile(int tileHeight, int tileWidth) {
   rotateZ(PI/2.);
   beginShape(QUADS);
-  vertex(0, 0, 0);
-  vertex(tileHeight, 0, 0);
-  vertex(tileHeight, tileWidth, 0);
-  vertex(0, tileWidth, 0);
+  texture(roadTile);
+  vertex(0, 0, 0, 0, 0);
+  vertex(tileHeight, 0, 0, roadTile.width, 0);
+  vertex(tileHeight, tileWidth, 0, roadTile.width, roadTile.height);
+  vertex(0, tileWidth, 0, 0, roadTile.height);
   endShape();
 }
