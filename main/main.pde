@@ -18,7 +18,7 @@ void setup() {
   
   setupCar();
   setupCircuit();
-
+  setupCar2();
   noStroke();
 }
 
@@ -36,6 +36,7 @@ void draw() {
   translate(0, 25, 0);
 
   drawCar();
+  drawCar2();
   drawCircuit();
 }
 

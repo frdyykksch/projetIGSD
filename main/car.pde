@@ -1,8 +1,7 @@
 PShape carModel;
 
 void setupCar() {
-  carModel = loadShape("..\\resources\\Car.obj"); 
-
+  carModel = loadShape("..\\resources\\Car2.obj"); 
 }
 
 void drawCar() {
