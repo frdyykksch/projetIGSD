@@ -6,19 +6,19 @@ PImage roadTile;
 void setupCircuit() {
   pointsCircuit = new ArrayList<PVector>();
   
-  pointsCircuit.add(new PVector(0, 0));
-  pointsCircuit.add(new PVector(400, 0));
-  pointsCircuit.add(new PVector(600, 300));
-  pointsCircuit.add(new PVector(400, 600));
-  pointsCircuit.add(new PVector(0, 600));
-  pointsCircuit.add(new PVector(-200, 300));
-  pointsCircuit.add(new PVector(0, 0));
+  pointsCircuit.add(new PVector(0, 0, 0));
+  pointsCircuit.add(new PVector(400, 0, 50));
+  pointsCircuit.add(new PVector(600, 300, 100));
+  pointsCircuit.add(new PVector(400, 600, 50));
+  pointsCircuit.add(new PVector(0, 600, 25));
+  pointsCircuit.add(new PVector(-200, 300, 0));
+  pointsCircuit.add(new PVector(0, 0, 0));
   
   roadTile = loadImage("..\\resources\\roadTile.jpg");
 }
 
 void drawCircuit() {
-  stroke(1);
+  noStroke();
   noFill();
   textureMode(IMAGE);
   rotateX(PI/2);
@@ -34,16 +34,21 @@ void drawCircuit() {
     int dist = floor(pStart.dist(pEnd));
 
     PVector dir = PVector.sub(pEnd, pStart);
+
     float angle = atan2(dir.y, dir.x);
+    float slope = atan2(pEnd.z - pStart.z, dist);
 
     pushMatrix();
     translate(pStart.x, pStart.y);
     rotateZ(angle);
 
     for(int k = 0; k < dist; k += tileWidth) {
+      float t = k / (float) dist;
+      float z = lerp(pStart.z, pEnd.z, t);
       pushMatrix();
 
-      translate(k, 0);
+      translate(k, 0, z);
+      rotateY(-slope);
       drawTile(tileHeight, tileWidth);
 
       popMatrix();
