@@ -5,6 +5,9 @@ void setupEnv(){
 void lightMoon() {         // base illumination so textures are visible    // low global ambient
   directionalLight(100, 100, 140, 0, 1000, -1); // strong directional light
 }
+void lightSun() {         // base illumination so textures are visible    // low global ambient
+   // strong directional light
+}
 
 
 void drawEnv(){

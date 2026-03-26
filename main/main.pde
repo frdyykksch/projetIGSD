@@ -2,6 +2,7 @@ PImage cube;
 PImage cubeNight;
 PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 PShape Front, Back, Left, Right, Bottom, Top;
+boolean isNight = true;
 
 void setup() {
   size(800, 800, P3D);
@@ -22,7 +23,7 @@ void setup() {
   setupCar2();
   noStroke();
   setupEnv();
-  cubeNightDay(false);
+  cubeNightDay(isNight);
 }
 
 void draw() {
@@ -34,12 +35,27 @@ void draw() {
   
   float angleY = frameCount * 0.01;
   rotateY(angleY);
-  ambientLight(180, 180, 230);
-  drawCube(4000);
-  noLights();
-  lightMoon();
+  if (isNight) {
+    ambientLight(180, 180, 230);
+    drawCube(4000);
+    noLights();
+  } else {
+    drawCube(4000);
+  }
+  if (isNight) {
+    lightMoon();
+  } else {
+    lightSun();
+  }
   translate(0, 25, 0);
   drawCar();
   drawCar2();
   drawCircuit();
+}
+
+void keyPressed() {
+  if (key == 'n' || key == 'N') {
+    isNight = !isNight;
+    cubeNightDay(isNight);
+  }
 }
