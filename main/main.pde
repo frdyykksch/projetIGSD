@@ -1,9 +1,5 @@
 PImage cube;
-<<<<<<< Updated upstream
 PImage cubeNight;
-=======
-// Camera cam;
->>>>>>> Stashed changes
 PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 PShape Front, Back, Left, Right, Bottom, Top;
 boolean isNight = true;
@@ -53,88 +49,14 @@ void draw() {
     lightSun();
   }
   translate(0, 25, 0);
-<<<<<<< Updated upstream
-=======
-
-  // cam.update();
-  // cam.applyToScene();
-  // noCursor();
-
->>>>>>> Stashed changes
   drawCar();
   drawCar2();
   drawCircuit();
 }
 
-<<<<<<< Updated upstream
 void keyPressed() {
   if (key == 'n' || key == 'N') {
     isNight = !isNight;
     cubeNightDay(isNight);
   }
 }
-=======
-void drawCube(float s) {
-  noStroke();
-  float d = s / 2;
-
-  // Front
-  beginShape(QUADS);
-  texture(texFront);
-  vertex(-d, -d, -d, 0, 0);
-  vertex( d, -d, -d, texFront.width, 0);
-  vertex( d,  d, -d, texFront.width, texFront.height);
-  vertex(-d,  d, -d, 0, texFront.height);
-  endShape();
-
-  // Face Arrière
-  beginShape(QUADS);
-  texture(texBack);
-  vertex( d, -d,  d, 0, 0);
-  vertex(-d, -d,  d, texBack.width, 0);
-  vertex(-d,  d,  d, texBack.width, texBack.height);
-  vertex( d,  d,  d, 0, texBack.height);
-  endShape();
-
-  // Left
-  beginShape(QUADS);
-  texture(texLeft);
-  vertex(-d, -d,  d, 0, 0);
-  vertex(-d, -d, -d, texLeft.width, 0);
-  vertex(-d,  d, -d, texLeft.width, texLeft.height);
-  vertex(-d,  d,  d, 0, texLeft.height);
-  endShape();
-
-  // Right
-  beginShape(QUADS);
-  texture(texRight);
-  vertex( d, -d, -d, 0, 0);
-  vertex( d, -d,  d, texRight.width, 0);
-  vertex( d,  d,  d, texRight.width, texRight.height);
-  vertex( d,  d, -d, 0, texRight.height);
-  endShape();
-
-  // Top
-  beginShape(QUADS);
-  texture(texTop);
-  vertex(-d, -d,  d, 0, 0);
-  vertex( d, -d,  d, texTop.width, 0);
-  vertex( d, -d, -d, texTop.width, texTop.height);
-  vertex(-d, -d, -d, 0, texTop.height);
-  endShape();
-
-  // Bottom
-  beginShape(QUADS);
-  texture(texBottom);
-  vertex(-d,  d, -d, 0, 0);
-  vertex( d,  d, -d, texBottom.width, 0);
-  vertex( d,  d,  d, texBottom.width, texBottom.height);
-  vertex(-d,  d,  d, 0, texBottom.height);
-  endShape();
-}
-
-// void mouseMoved()   { cam.mouseMoved(); }
-// void mouseDragged() { cam.mouseMoved(); }
-// void keyPressed()   { cam.keyPressed(key);   }
-// void keyReleased()  { cam.keyReleased(key);  }
->>>>>>> Stashed changes
