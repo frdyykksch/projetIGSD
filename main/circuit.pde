@@ -5,79 +5,118 @@ PImage roadTile;
 
 void setupCircuit() {
   pointsCircuit = new ArrayList<PVector>();
-  
-  pointsCircuit.add(new PVector(0, 0));
-  pointsCircuit.add(new PVector(400, 0));
-  pointsCircuit.add(new PVector(600, 300));
-  pointsCircuit.add(new PVector(400, 600));
-  pointsCircuit.add(new PVector(0, 600));
-  pointsCircuit.add(new PVector(-200, 300));
-  pointsCircuit.add(new PVector(0, 0));
-  
+
+  pointsCircuit.add(new PVector(-600, 0));
+  pointsCircuit.add(new PVector(-450, -240));
+  pointsCircuit.add(new PVector(-380, -330));
+  pointsCircuit.add(new PVector(-260, -380));
+  pointsCircuit.add(new PVector(-100, -200)); // tight inside flick
+  pointsCircuit.add(new PVector(-20, -160));
+  pointsCircuit.add(new PVector(120, -190));
+  pointsCircuit.add(new PVector(260, -150));
+  pointsCircuit.add(new PVector(380, -60));
+  pointsCircuit.add(new PVector(420, 50));
+  pointsCircuit.add(new PVector(380, 170));
+  pointsCircuit.add(new PVector(280, 250));
+  pointsCircuit.add(new PVector(140, 320));
+  pointsCircuit.add(new PVector(-20, 360));
+  pointsCircuit.add(new PVector(-180, 330));
+  pointsCircuit.add(new PVector(-340, 260));
+  pointsCircuit.add(new PVector(-460, 160));
+  pointsCircuit.add(new PVector(-650, 110));
+
   roadTile = loadImage("..\\resources\\roadTile.jpg");
 }
 
 void drawCircuit() {
   noStroke();
-  // noFill();
-  // stroke(255);
   textureMode(IMAGE);
-  stroke(2);
   noFill();
   rotateX(PI/2);
 
-  int steps = 60;
+  int stepsPerSegment = segmentsParCourbe;
+  ArrayList<PVector> samplePoints = sampleCircuit(stepsPerSegment);
 
   pushMatrix();
-  for(int i = 0; i < pointsCircuit.size() - 1; i++) {
-    PVector pStart = pointsCircuit.get(i);
-    PVector pEnd   = pointsCircuit.get(i+1);
-    PVector[] cps  = getControlPoints(pStart, pEnd, 0.25, -100.0, 0.75, -25.0);
-    PVector cp1    = cps[0];
-    PVector cp2    = cps[1];
+  beginShape(TRIANGLE_STRIP);
+  texture(roadTile);
 
-    beginShape(TRIANGLE_STRIP);
-    texture(roadTile);
+  float vTex = 0;
+  float vScale = roadTile.height / 80.0;
+  int m = samplePoints.size();
 
-    for(int s = 0; s <= steps; s++) {
-      float t  = s / (float) steps;
-      float t2 = min(t + 0.01, 1.0);
+  for (int i = 0; i < m; i++) {
+    PVector pt = samplePoints.get(i);
+    PVector nextPt = samplePoints.get((i + 1) % m);
 
-      PVector pt  = cubicBezierPoint(pStart, cp1, cp2, pEnd, t);
-      PVector pt2 = cubicBezierPoint(pStart, cp1, cp2, pEnd, t2);
+    PVector tangent = PVector.sub(nextPt, pt);
+    tangent.normalize();
 
-      PVector tangent = PVector.sub(pt2, pt);
-      PVector vNorm    = new PVector(-tangent.y, tangent.x, 0);
-      vNorm.normalize();
-      vNorm.mult(largeurRoute / 1);
+    PVector n = new PVector(-tangent.y, tangent.x, 0);
+    n.normalize();
+    n.mult(largeurRoute);
 
-      PVector left  = PVector.sub(pt, vNorm);
-      PVector right = PVector.add(pt, vNorm);
+    PVector left = PVector.sub(pt, n);
+    PVector right = PVector.add(pt, n);
 
-      float u0 = 0;
-      float u1 = roadTile.width;
-      float v  = (t * PVector.dist(pStart, pEnd) / 80.0) * roadTile.height % roadTile.height;
+    float u0 = 0;
+    float u1 = roadTile.width;
 
-      vertex(left.x,  left.y,  0, u0, v);
-      vertex(right.x, right.y, 0, u1, v);
-    }
-    endShape();
-  } popMatrix();
+    vertex(left.x, left.y, 0, u0, vTex);
+    vertex(right.x, right.y, 0, u1, vTex);
+
+    vTex += PVector.dist(pt, nextPt) * vScale;
+    if (vTex > roadTile.height) vTex %= roadTile.height;
+  }
+
+  endShape(CLOSE);
+  popMatrix();
 }
 
-// get controlpoints for point1 & point2 (first try only quadratic curves so only one controlpoint)
-PVector[] getControlPoints(PVector p1, PVector p2, float tension1, float bow1, float tension2, float bow2) {
-PVector dir = PVector.sub(p2, p1);
-PVector vNorm = new PVector(-dir.y, dir.x, 0);
-vNorm.normalize();
 
-PVector mid1 = PVector.lerp(p1, p2, tension1);
-PVector cp1  = PVector.add(mid1, PVector.mult(vNorm, bow1));
 
-PVector mid2 = PVector.lerp(p1, p2, tension2);
-PVector cp2  = PVector.add(mid2, PVector.mult(vNorm, bow2));
 
-return new PVector[]{ cp1, cp2 };
+
+
+
+ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
+  ArrayList<PVector> sample = new ArrayList<PVector>();
+  int n = pointsCircuit.size();
+
+  for (int i = 0; i < n; i++) {
+    PVector p0 = pointsCircuit.get((i - 1 + n) % n);
+    PVector p1 = pointsCircuit.get(i);
+    PVector p2 = pointsCircuit.get((i + 1) % n);
+    PVector p3 = pointsCircuit.get((i + 2) % n);
+
+    for (int s = 0; s < stepsPerSegment; s++) {
+      float t = s / (float) stepsPerSegment;
+      sample.add(catmullRomPoint(p0, p1, p2, p3, t));
+    }
+  }
+  sample.add(sample.get(0).copy());
+  return sample;
+}
+
+
+
+
+
+
+PVector catmullRomPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {
+  float t2 = t*t;
+  float t3 = t2*t;
+
+  float a0 = -0.5f*t3 + t2 - 0.5f*t;
+  float a1 =  1.5f*t3 - 2.5f*t2 + 1.0f;
+  float a2 = -1.5f*t3 + 2.0f*t2 + 0.5f*t;
+  float a3 =  0.5f*t3 - 0.5f*t2;
+
+  return new PVector(
+    a0*p0.x + a1*p1.x + a2*p2.x + a3*p3.x,
+    a0*p0.y + a1*p1.y + a2*p2.y + a3*p3.y,
+    a0*p0.z + a1*p1.z + a2*p2.z + a3*p3.z
+  );
 }
 
 PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {

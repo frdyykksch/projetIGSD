@@ -1,64 +1,31 @@
-void setupEnv(){
+PImage cube, cubeNight;
+PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 
-
-}
-void lightMoon() {         // base illumination so textures are visible    // low global ambient
-  directionalLight(100, 100, 140, 0, 1000, -1); // strong directional light
-}
-void lightSun() {         // base illumination so textures are visible    // low global ambient
-   // strong directional light
+void setupEnv() {
+  cube = loadImage("..\\resources\\desert.png");
+  cubeNight = loadImage("..\\resources\\night.jpg");
+  cubeNightDay(false);
 }
 
-
-void drawEnv(){
-
-
+void updateLighting(boolean night) {
+  if(night) { lightMoon(); }
+  else { lightSun(); }
 }
 
-void drawTree(){
-
+void lightMoon() {
+  ambientLight(180, 180, 230);
+  directionalLight(100, 100, 140, 0, 1000, -1);
 }
 
-void drawLampadaire(){
-
+void lightSun() {
+  ambientLight(255, 255, 200);
+  directionalLight(255, 255, 200, 0, -1000, -1);
 }
 
-void drawGround(){
-
-
-}
-void DrawDustParticules(){
-
-
-}
-//key pressed N
-void drawNightDayCycle(){
-
-}
-void cubeNightDay(boolean night){
-  PImage textureImage;
-  if(night){
-    textureImage = loadImage("..\\resources\\night.jpg");
-  } else {
-    textureImage = loadImage("..\\resources\\desert.png");
-  }
-  
-  int w = textureImage.width / 4;
-  int h = textureImage.height / 3;
-
-  texTop    = textureImage.get(w, 0, w, h);
-  texLeft   = textureImage.get(0, h, w, h);
-  texFront  = textureImage.get(w, h, w, h);
-  texRight  = textureImage.get(2 * w, h, w, h);
-  texBack   = textureImage.get(3 * w, h, w, h);
-  texBottom = textureImage.get(w, 2 * h, w, h);
-  
-}
-
-void drawCube(float s) {
+void drawSkybox(float size) {
   noStroke();
-  float d = s / 2;
-  //ambientLight(0, 0, 0); // global ambient
+  float d = size / 2;
+  
   // Front
   normal(0, 0, -1);
   beginShape(QUADS);
@@ -69,7 +36,7 @@ void drawCube(float s) {
   vertex(-d,  d, -d, 0, texFront.height);
   endShape();
 
-  // Face Arrière
+  // Back
   normal(0, 0, 1);
   beginShape(QUADS);
   texture(texBack);
@@ -118,4 +85,23 @@ void drawCube(float s) {
   vertex( d,  d,  d, texBottom.width, texBottom.height);
   vertex(-d,  d,  d, 0, texBottom.height);
   endShape();
+}
+
+void cubeNightDay(boolean night) {
+  PImage textureImage;
+  if (night) {
+    textureImage = loadImage("..\\resources\\night.jpg");
+  } else {
+    textureImage = loadImage("..\\resources\\desert.png");
+  }
+  
+  int w = textureImage.width / 4;
+  int h = textureImage.height / 3;
+
+  texTop    = textureImage.get(w, 0, w, h);
+  texLeft   = textureImage.get(0, h, w, h);
+  texFront  = textureImage.get(w, h, w, h);
+  texRight  = textureImage.get(2 * w, h, w, h);
+  texBack   = textureImage.get(3 * w, h, w, h);
+  texBottom = textureImage.get(w, 2 * h, w, h);
 }
