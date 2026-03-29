@@ -8,14 +8,13 @@ void setup() {
   noStroke();
 
   cars = new ArrayList<Car>();
-  car1 = new Car(0, 0, 0, "..\\resources\\Car2.obj");
+  car1 = new Car(-600, 0, 0, "..\\resources\\Car2.obj");
   car2 = new Car(60, 0, 0, "..\\resources\\PoliceCar.obj");
-
-  setupCircuit();
   cars.add(car1);
   cars.add(car2);
-
-  setupEnv();  
+  
+  setupCircuit();
+  setupEnv();
 }
 
 void draw() {
@@ -59,4 +58,3 @@ void keyPressed() {
     cubeNightDay(isNight);
   }
 }
-

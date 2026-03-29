@@ -127,3 +127,12 @@ PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t
     mt*mt*mt*p0.z + 3*mt*mt*t*p1.z + 3*mt*t*t*p2.z + t*t*t*p3.z
   );
 }
+
+boolean isOnCircuit(float x, float z) {
+  for (PVector pt : pointsCircuit) {
+    if (dist(x, z, pt.x, pt.y) < largeurRoute) {
+      return true;
+    }
+  }
+  return false;
+}
