@@ -18,24 +18,27 @@ class Car {
     this.model = loadShape(modelPath);
   }
 
-  void update() {
-    if(isUp) speed = 2.0;
-    else if(isDown) speed = -1.0;
-    else speed = 0;
+  void update(Circuit c) {
+    // controls
+    if(isUp) speed = 2.8;
+    else if(isDown) speed = -1.5;
+    else speed *= 0.9;
 
-    if(isLeft) angle -= 0.05;
-    if(isRight) angle += 0.05;
+    if(isLeft) angle -= 0.06;
+    if(isRight) angle += 0.06;
 
+    // movement
     pos.x += speed * cos(angle);
     pos.z += speed * sin(angle);
     oldY = pos.y;
 
-
-    boolean onCircuit = isOnCircuit(pos.x, pos.y, pos.z);
+    // collision
+    boolean collision = c.isCollision(pos.x, pos.y, pos.z);
     println(pos);
-    // println(onCircuit);
-    if(onCircuit) { pos.y = oldY; vy = 0; }
+    if(collision) { pos.y = oldY; vy = 0; }
     else { vy += g; pos.y += vy; }
+
+    if(pos.y > 100) { pos = startPos; }
   }
 
   void display() {
