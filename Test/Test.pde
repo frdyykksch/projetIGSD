@@ -1,108 +1,93 @@
+boolean isNight = false;
+ArrayList<Car> cars;
 Car car1;
-PImage cube;
-PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
+Car car2;
 
 void setup() {
   size(800, 800, P3D);
   noStroke();
 
-  cube = loadImage("..\\resources\\desert.png");
-  car1 = new Car(50, -100, 100, 0, "..\\resources\\Car2.obj");
+  setupCircuit(); // Initialise les points du circuit
   
-  int w = cube.width / 4;
-  int h = cube.height / 3;
-
-  texTop    = cube.get(w, 0, w, h);
-  texLeft   = cube.get(0, h, w, h);
-  texFront  = cube.get(w, h, w, h);
-  texRight  = cube.get(2 * w, h, w, h);
-  texBack   = cube.get(3 * w, h, w, h);
-  texBottom = cube.get(w, 2 * h, w, h);
-
-  setupCircuit();
+  cars = new ArrayList<Car>();
+  // car1 : contrôlée par le joueur (commence à l'index 0)
+  car1 = new Car(0, "..\\resources\\Car2.obj");
+  // car2 : IA ou vitesse constante (commence à l'index 5)
+  car2 = new Car(5, "..\\resources\\PoliceCar.obj");
+  car2.speed = 0.02; // La deuxième voiture avance seule
+  
+  cars.add(car1);
+  cars.add(car2);
+  
+  setupEnv();
 }
 
 void draw() {
   background(0);
-  ambientLight(255, 255, 200);
-  directionalLight(255, 255, 200, 0, -1000, -1);
   
-  camera(width/2, height/2, 100, width/2, height/2, 0, 0, 1, 0);
-  perspective(PI/2, float(width)/float(height), 1, 10000);
-  translate(width/2, height/2);
-
-  rotateY(frameCount * 0.01);
-
-  car1.update();
-  car1.display();
-
-  drawSkybox(4000);
-  // noLights();
+  // --- VUE 1 : Caméra Suiveuse (Plein écran) ---
+  PVector p = car1.getWorldPos(car1.trackPos.x);
+  PVector target = car1.getWorldPos(car1.trackPos.x + 0.1);
   
-  drawCircuit();
+  float dist = 150;
+  float h = 60;
+  PVector dir = PVector.sub(p, target);
+  dir.normalize();
+  
+  camera(p.x + dir.x*dist, p.y - h, p.z + dir.z*dist, 
+         p.x, p.y, p.z, 
+         0, 1, 0);
+  
+  renderScene();
+
+  // --- VUE 2 : Minimap (Haut à gauche) ---
+  hint(DISABLE_DEPTH_TEST);
+  // On définit une zone de dessin de 200x200
+  pushMatrix();
+  // Caméra vue du ciel : très haute sur Y, regarde vers le bas
+  camera(0, -1500, 0, 0, 0, 0, 0, 0, -1);
+  perspective(PI/4.0, 1.0, 10, 5000);
+  
+  viewport(10, 10, 200, 200); 
+  renderScene();
+  popMatrix();
+  hint(ENABLE_DEPTH_TEST);
+  
+  // Reset viewport pour le prochain frame
+  viewport(0, 0, width, height);
 }
 
-void drawSkybox(float size) {
-  noStroke();
-  float d = size / 2;
-  
-  // Front
-  normal(0, 0, -1);
-  beginShape(QUADS);
-  texture(texFront);
-  vertex(-d, -d, -d, 0, 0);
-  vertex( d, -d, -d, texFront.width, 0);
-  vertex( d,  d, -d, texFront.width, texFront.height);
-  vertex(-d,  d, -d, 0, texFront.height);
-  endShape();
+void renderScene() {
+  updateLighting(isNight);
+  drawSkybox(4000);
+  drawCircuit();
+  for(Car c : cars) {
+    c.update();
+    c.display();
+  }
+}
 
-  // Back
-  normal(0, 0, 1);
-  beginShape(QUADS);
-  texture(texBack);
-  vertex( d, -d,  d, 0, 0);
-  vertex(-d, -d,  d, texBack.width, 0);
-  vertex(-d,  d,  d, texBack.width, texBack.height);
-  vertex( d,  d,  d, 0, texBack.height);
-  endShape();
+void viewport(int x, int y, int w, int h) {
+  resetMatrix();
+  float ratio = (float)w / (float)h;
+  perspective(PI/3.0, ratio, 1, 10000);
+}
 
-  // Left
-  normal(-1, 0, 0);
-  beginShape(QUADS);
-  texture(texLeft);
-  vertex(-d, -d,  d, 0, 0);
-  vertex(-d, -d, -d, texLeft.width, 0);
-  vertex(-d,  d, -d, texLeft.width, texLeft.height);
-  vertex(-d,  d,  d, 0, texLeft.height);
-  endShape();
+void keyPressed() {
+  if(key == 'n' || key == 'N') {
+    isNight = !isNight;
+    cubeNightDay(isNight);
+  }
+  setControl(keyCode, key, true);
+}
 
-  // Right
-  normal(1, 0, 0);
-  beginShape(QUADS);
-  texture(texRight);
-  vertex( d, -d, -d, 0, 0);
-  vertex( d, -d,  d, texRight.width, 0);
-  vertex( d,  d,  d, texRight.width, texRight.height);
-  vertex( d,  d, -d, 0, texRight.height);
-  endShape();
+void keyReleased() {
+  setControl(keyCode, key, false);
+}
 
-  // Top
-  normal(0, -1, 0);
-  beginShape(QUADS);
-  texture(texTop);
-  vertex(-d, -d,  d, 0, 0);
-  vertex( d, -d,  d, texTop.width, 0);
-  vertex( d, -d, -d, texTop.width, texTop.height);
-  vertex(-d, -d, -d, 0, texTop.height);
-  endShape();
-
-  // Bottom
-  normal(0, 1, 0);
-  beginShape(QUADS);
-  texture(texBottom);
-  vertex(-d,  d, -d, 0, 0);
-  vertex( d,  d, -d, texBottom.width, 0);
-  vertex( d,  d,  d, texBottom.width, texBottom.height);
-  vertex(-d,  d,  d, 0, texBottom.height);
-  endShape();
+void setControl(int code, char k, boolean state) {
+  if(code == LEFT  || k == 'a' || k == 'A') car1.isLeft  = state;
+  if(code == RIGHT || k == 'd' || k == 'D') car1.isRight = state;
+  if(code == UP    || k == 'w' || k == 'W') car1.isUp    = state;
+  if(code == DOWN  || k == 's' || k == 'S') car1.isDown  = state;
 }

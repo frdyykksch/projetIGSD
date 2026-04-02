@@ -2,6 +2,7 @@ ArrayList<PVector> pointsCircuit;
 int segmentsParCourbe = 20;
 float largeurRoute = 40;
 PImage roadTile;
+ArrayList<PVector> samplePoints;
 
 void setupCircuit() {
   pointsCircuit = new ArrayList<PVector>();
@@ -10,7 +11,7 @@ void setupCircuit() {
   pointsCircuit.add(new PVector(-450, 0, -240));
   pointsCircuit.add(new PVector(-380, 0, -330));
   pointsCircuit.add(new PVector(-260, 0, -380));
-  pointsCircuit.add(new PVector(-100, 0, -200)); // tight inside flick
+  pointsCircuit.add(new PVector(-100, 0, -200));
   pointsCircuit.add(new PVector(-20, 0, -160));
   pointsCircuit.add(new PVector(120, 0, -190));
   pointsCircuit.add(new PVector(260, 0, -150));
@@ -24,7 +25,7 @@ void setupCircuit() {
   pointsCircuit.add(new PVector(-340, 0, 260));
   pointsCircuit.add(new PVector(-460, 0, 160));
   pointsCircuit.add(new PVector(-650, 0, 110));
-
+  
   roadTile = loadImage("..\\resources\\roadTile.jpg");
 }
 
@@ -33,7 +34,7 @@ void drawCircuit() {
   textureMode(IMAGE);
 
   int stepsPerSegment = segmentsParCourbe;
-  ArrayList<PVector> samplePoints = sampleCircuit(stepsPerSegment);
+  samplePoints = sampleCircuit(stepsPerSegment);
 
   beginShape(TRIANGLE_STRIP);
   texture(roadTile);
@@ -51,7 +52,7 @@ void drawCircuit() {
     PVector tangent = PVector.sub(nextPt, pt);
     tangent.normalize();
 
-    PVector n = new PVector(-tangent.z, 0, tangent.x); 
+    PVector n = new PVector(-tangent.z, 0, tangent.x);
     n.normalize();
     n.mult(largeurRoute);
 
@@ -72,11 +73,6 @@ void drawCircuit() {
   endShape(CLOSE);
 }
 
-
-
-
-
-
 ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
   ArrayList<PVector> sample = new ArrayList<PVector>();
   int n = pointsCircuit.size();
@@ -95,11 +91,6 @@ ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
   sample.add(sample.get(0).copy());
   return sample;
 }
-
-
-
-
-
 
 PVector catmullRomPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {
   float t2 = t*t;
@@ -127,11 +118,9 @@ PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t
 }
 
 boolean isOnCircuit(float x, float y, float z) {
-    for(PVector p : pointsCircuit) {
-        float dist = dist(0, y, 0, p.y);
-        println(dist);
-        if(dist < 6) {
-            return true;
-        }
+  if(samplePoints == null) { return false; }
+    for(PVector p : samplePoints) {
+        float dist = dist(x, y, z, p.x, p.y, p.z);
+        if(dist < largeurRoute) { return true; }
     } return false;
 }
