@@ -6,24 +6,24 @@ PImage roadTile;
 void setupCircuit() {
   pointsCircuit = new ArrayList<PVector>();
 
-  pointsCircuit.add(new PVector(-600, 0));
-  pointsCircuit.add(new PVector(-450, -240));
-  pointsCircuit.add(new PVector(-380, -330));
-  pointsCircuit.add(new PVector(-260, -380));
-  pointsCircuit.add(new PVector(-100, -200)); // tight inside flick
-  pointsCircuit.add(new PVector(-20, -160));
-  pointsCircuit.add(new PVector(120, -190));
-  pointsCircuit.add(new PVector(260, -150));
-  pointsCircuit.add(new PVector(380, -60));
-  pointsCircuit.add(new PVector(420, 50));
-  pointsCircuit.add(new PVector(380, 170));
-  pointsCircuit.add(new PVector(280, 250));
-  pointsCircuit.add(new PVector(140, 320));
-  pointsCircuit.add(new PVector(-20, 360));
-  pointsCircuit.add(new PVector(-180, 330));
-  pointsCircuit.add(new PVector(-340, 260));
-  pointsCircuit.add(new PVector(-460, 160));
-  pointsCircuit.add(new PVector(-650, 110));
+  pointsCircuit.add(new PVector(-600, 0, 0));
+  pointsCircuit.add(new PVector(-450, 0, -240));
+  pointsCircuit.add(new PVector(-380, 0, -330));
+  pointsCircuit.add(new PVector(-260, 0, -380));
+  pointsCircuit.add(new PVector(-100, 0, -200)); // tight inside flick
+  pointsCircuit.add(new PVector(-20, 0, -160));
+  pointsCircuit.add(new PVector(120, 0, -190));
+  pointsCircuit.add(new PVector(260, 0, -150));
+  pointsCircuit.add(new PVector(380, 0, -60));
+  pointsCircuit.add(new PVector(420, 0, 50));
+  pointsCircuit.add(new PVector(380, 0, 170));
+  pointsCircuit.add(new PVector(280, 0, 250));
+  pointsCircuit.add(new PVector(140, 0, 320));
+  pointsCircuit.add(new PVector(-20, 0, 360));
+  pointsCircuit.add(new PVector(-180, 0, 330));
+  pointsCircuit.add(new PVector(-340, 0, 260));
+  pointsCircuit.add(new PVector(-460, 0, 160));
+  pointsCircuit.add(new PVector(-650, 0, 110));
 
   roadTile = loadImage("..\\resources\\roadTile.jpg");
 }
@@ -31,13 +31,10 @@ void setupCircuit() {
 void drawCircuit() {
   noStroke();
   textureMode(IMAGE);
-  noFill();
-  rotateX(PI/2);
 
   int stepsPerSegment = segmentsParCourbe;
   ArrayList<PVector> samplePoints = sampleCircuit(stepsPerSegment);
 
-  pushMatrix();
   beginShape(TRIANGLE_STRIP);
   texture(roadTile);
 
@@ -45,14 +42,16 @@ void drawCircuit() {
   float vScale = roadTile.height / 80.0;
   int m = samplePoints.size();
 
-  for (int i = 0; i < m; i++) {
+  pushMatrix();
+  for(int i = 0; i < m; i++) {
+    pushMatrix();
     PVector pt = samplePoints.get(i);
     PVector nextPt = samplePoints.get((i + 1) % m);
 
     PVector tangent = PVector.sub(nextPt, pt);
     tangent.normalize();
 
-    PVector n = new PVector(-tangent.y, tangent.x, 0);
+    PVector n = new PVector(-tangent.z, 0, tangent.x); 
     n.normalize();
     n.mult(largeurRoute);
 
@@ -62,17 +61,16 @@ void drawCircuit() {
     float u0 = 0;
     float u1 = roadTile.width;
 
-    vertex(left.x, left.y, 0, u0, vTex);
-    vertex(right.x, right.y, 0, u1, vTex);
+    vertex(left.x, left.y, left.z, u0, vTex);
+    vertex(right.x, right.y, right.z, u1, vTex);
 
     vTex += PVector.dist(pt, nextPt) * vScale;
-    if (vTex > roadTile.height) vTex %= roadTile.height;
-  }
+    if(vTex > roadTile.height) vTex %= roadTile.height;
+    popMatrix();
+  } popMatrix();
 
   endShape(CLOSE);
-  popMatrix();
 }
-
 
 
 
@@ -83,7 +81,7 @@ ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
   ArrayList<PVector> sample = new ArrayList<PVector>();
   int n = pointsCircuit.size();
 
-  for (int i = 0; i < n; i++) {
+  for(int i = 0; i < n; i++) {
     PVector p0 = pointsCircuit.get((i - 1 + n) % n);
     PVector p1 = pointsCircuit.get(i);
     PVector p2 = pointsCircuit.get((i + 1) % n);
@@ -128,11 +126,12 @@ PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t
   );
 }
 
-boolean isOnCircuit(float x, float z) {
-  for (PVector pt : pointsCircuit) {
-    if (dist(x, z, pt.x, pt.y) < largeurRoute) {
-      return true;
-    }
-  }
-  return false;
+boolean isOnCircuit(float x, float y, float z) {
+    for(PVector p : pointsCircuit) {
+        float dist = dist(0, y, 0, p.y);
+        println(dist);
+        if(dist < 6) {
+            return true;
+        }
+    } return false;
 }

@@ -24,9 +24,10 @@ void draw() {
     c.update();
     c.display();
   }
-
-  setupCamera(car1);
   
+  translate(width/2, height/2, 0);
+  setupCamera(car1);
+
   updateLighting(isNight);
   drawSkybox(4000);
   noLights();
@@ -49,7 +50,6 @@ void setupCamera(Car targetCar) {
   
   camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
   perspective(PI/2.5, float(width)/float(height), 1, 10000);
-  translate(width/2, height/2);
 }
 
 void keyPressed() {

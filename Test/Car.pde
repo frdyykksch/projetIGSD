@@ -7,35 +7,28 @@ class Car {
   float g = 0.125;
   PShape model;
 
-  Car(float x, float z, float speed, String modelPath) {
-    this.pos = new PVector(x, 0, z);
+  Car(float x, float y, float z, float speed, String modelPath) {
+    this.pos = new PVector(x, y, z);
     this.angle = 0;
     this.speed = speed;
-    this.oldY = 0;
     this.vy = 0;
     this.model = loadShape(modelPath);
   }
 
   void update() {
-    pos.x += speed * cos(angle);
-    pos.z += speed * sin(angle);
+    println(pos);
     oldY = pos.y;
 
-    if(keyPressed) {
-      switch(keyCode) {
-        case LEFT: angle -= 0.05; break;
-        case RIGHT: angle += 0.05; break;
-        case UP: speed = 2.0; break;
-        case DOWN: speed = -1.0; break;
-      }
-    } else { speed = 0; }
-
-
     boolean onCircuit = isOnCircuit(pos.x, pos.y, pos.z);
-    println(pos);
-    // println(onCircuit);
+    println(onCircuit);
     if(onCircuit) { pos.y = oldY; vy = 0; } 
     else { vy += g; pos.y += vy; }
+
+
+    // boolean onCircuit = isOnCircuit(pos.x, pos.y, pos.z);
+    // println(onCircuit);
+    // if(onCircuit) { speed = 2; } 
+    // else { speed = 0.5; }
   }
 
   void display() {
