@@ -48,14 +48,14 @@ void draw() {
   popMatrix();
 
   // Draw minimap (top-left corner)
-  drawMinimap(circuitF1, 300, -100, -100);
+  drawMinimap(circuitF1, 250, -100, -100);
 }
 
 void drawMinimap(Circuit c, float size, float x, float y) {
   ArrayList<PVector> points = c.samplePoints;
 
   // map/circuit boundaries
-  float minX = points.get(0).x; float maxX = points.get(0).x; 
+  float minX = points.get(0).x; float maxX = points.get(0).x;
   float minZ = points.get(0).z; float maxZ = points.get(0).z;
   for(PVector p : points) {
     minX = min(minX, p.x); maxX = max(maxX, p.x);
@@ -69,8 +69,7 @@ void drawMinimap(Circuit c, float size, float x, float y) {
         // fond
         fill(0, 0, 0, 100);
         noStroke();
-        rect(x, y, size, size);
-        
+        rect(x, y, size, size - 50);
         
         // cirucit
         stroke(255);
@@ -78,14 +77,14 @@ void drawMinimap(Circuit c, float size, float x, float y) {
         noFill();
         beginShape();
         for (PVector p : points)
-        vertex(x + (p.x - minX) * scale, y + (p.z - minZ) * scale);
+          vertex(x + (p.x - minX) * scale, y + (p.z - minZ) * scale);
         endShape(CLOSE);
         
         // car
         fill(255, 0, 0);
         noStroke();
-        translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale); // POURQUOI LA VOITURE ELLE EST PAS AU DESSUS??!?!
         pushMatrix();
+        translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale); // POURQUOI LA VOITURE ELLE EST PAS AU DESSUS??!?!
         rotate(car1.angle);
         triangle(-10, -6, -10, 6, 10, 0);
         popMatrix();

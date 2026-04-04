@@ -1,10 +1,11 @@
 class Car {
   PVector pos;
   float oldY; // for collison
-  float angle;
+  float angle; // yaw
   float speed;
 
-  float tilt = 0;
+  float roll = 0;
+  float pitch = 0;
 
   float vy; // gravity, collsision
   float g = 0.125;
@@ -24,26 +25,36 @@ class Car {
 
   void update(Circuit c) {
     // controls
-    if(isUp)        speed = 5.8;
-    else if(isDown) speed = -2.5;
+    if(isUp) { speed = 5.8; }
+    else if(isDown) { speed = -2.5; }
     else speed *= 0.9;
 
-    if(isLeft) {        angle -= 0.06;    tilt = -0.15 * (speed / 6.0); }
-    else if(isRight) {  angle += 0.06;    tilt = 0.15 * (speed / 6.0); }
-    else { tilt = lerp(tilt, 0, 0.1); }
+    if(isLeft) {        angle -= 0.06;    roll = -0.15 * (speed / 6.0); }
+    else if(isRight) {  angle += 0.06;    roll = 0.15 * (speed / 6.0); }
+    else { roll = lerp(roll, 0, 0.1); }
+
+    float roadY = c.getRoadY(pos.x, pos.z);
+    
+    // pitch
+    float lookAhead = 10;
+    float nextX = pos.x + cos(angle) * lookAhead;
+    float nextZ = pos.z + sin(angle) * lookAhead;
+    float nextRoadY = c.getRoadY(nextX, nextZ);
+    float targetPitch = atan2(nextRoadY - roadY, lookAhead);
+    pitch = lerp(pitch, targetPitch, 0.2);
 
     // movement
     pos.x += speed * cos(angle);
     pos.z += speed * sin(angle);
     oldY = pos.y;
 
-    // collision
-    boolean collision = c.isCollision(pos.x, pos.y, pos.z);
-    println(pos);
-    if(collision) { pos.y = oldY; vy = 0; }
-    else { vy += g; pos.y += vy; }
+    if(c.isCollision(pos.x, pos.y, pos.z)) {
+      // float roadY = c.getRoadY(pos.x, pos.z);
+      pos.y = roadY;
+      vy = 0;
+    } else { vy += g; pos.y += vy; }
 
-    if(pos.y > 100) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
+    if(pos.y > 200) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
   }
 
   void display() {
@@ -53,7 +64,8 @@ class Car {
     rotateX(PI);
     rotateY(PI);
     rotateY(angle);
-    rotateX(tilt);
+    rotateX(roll);
+    rotateZ(pitch);
 
     scale(10);
     shape(model);
