@@ -125,7 +125,7 @@ class Circuit {
     if(samplePoints == null) { return false; }
       for(PVector p : samplePoints) {
           float dist = dist(x, y, z, p.x, p.y, p.z);
-          if(dist < largeurRoute) { return true; }
+          if(dist < largeurRoute && y <= p.y) { return true; }
       } return false;
   }
 

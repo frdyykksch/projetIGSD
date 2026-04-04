@@ -1,13 +1,17 @@
 class Car {
   PVector pos;
-  float oldY;
+  float oldY; // for collison
   float angle;
   float speed;
-  float vy;
+
+  float tilt = 0;
+
+  float vy; // gravity, collsision
   float g = 0.125;
+
   PShape model;
 
-  boolean isLeft, isRight, isUp, isDown;
+  boolean isLeft, isRight, isUp, isDown; // movement
 
   Car(float x, float z, float speed, String modelPath) {
     this.pos = new PVector(x, 0, z);
@@ -20,12 +24,13 @@ class Car {
 
   void update(Circuit c) {
     // controls
-    if(isUp) speed = 2.8;
-    else if(isDown) speed = -1.5;
+    if(isUp)        speed = 5.8;
+    else if(isDown) speed = -2.5;
     else speed *= 0.9;
 
-    if(isLeft) angle -= 0.06;
-    if(isRight) angle += 0.06;
+    if(isLeft) {        angle -= 0.06;    tilt = -0.15 * (speed / 6.0); }
+    else if(isRight) {  angle += 0.06;    tilt = 0.15 * (speed / 6.0); }
+    else { tilt = lerp(tilt, 0, 0.1); }
 
     // movement
     pos.x += speed * cos(angle);
@@ -38,7 +43,7 @@ class Car {
     if(collision) { pos.y = oldY; vy = 0; }
     else { vy += g; pos.y += vy; }
 
-    if(pos.y > 100) { pos = startPos; }
+    if(pos.y > 100) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
   }
 
   void display() {
@@ -48,6 +53,7 @@ class Car {
     rotateX(PI);
     rotateY(PI);
     rotateY(angle);
+    rotateX(tilt);
 
     scale(10);
     shape(model);
