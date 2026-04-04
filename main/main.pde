@@ -15,6 +15,7 @@ void setup() {
   noStroke();
   
   setupEnv();
+  cubeNightDay(isNight);
   circuitF1 = new Circuit();
 
   startPos = new PVector(-600, 0, 0);
@@ -22,24 +23,31 @@ void setup() {
   car1 = new Car(startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
   car2 = new Car(60, 0, 0, "..\\resources\\PoliceCar.obj");
   cars.add(car1);
-  cars.add(car2);
+  // cars.add(car2);
   car1.angle = circuitF1.getSpawnAngle();
 }
 
 void draw() {
   background(0);
-
-  translate(width/2, height/2, 0);
-  setupCamera(car1);
-  updateLighting(isNight);
   drawSkybox(4000);
-  
+
+  if (isNight) {
+    lightMoon();
+  } else {
+    lightSun();
+  }
+
   for(Car c : cars) {
+    c.backLights();
     c.update(circuitF1);
     c.display();
   }
 
-  noLights();
+  translate(width/2, height/2, 0);
+  setupCamera(car1);
+
+  drawSkybox(4000);
+
   circuitF1.display();
 }
 

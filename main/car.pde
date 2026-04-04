@@ -54,4 +54,18 @@ class Car {
     
     popMatrix();
   }
+
+  void backLights() {
+    if (!isNight) return;
+
+    // PRIMARY SOLUTION: Position pointLight directly behind car using angle
+    float lightDistance = 25; // Distance behind the car
+    float backLightX = pos.x - lightDistance * cos(angle);
+    float backLightZ = pos.z - lightDistance * sin(angle);
+    float backLightY = pos.y; // Slightly above car for better illumination
+    
+    //pointLight(255, 0, 0, backLightX, backLightY-2, backLightZ);
+    pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
+    pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
+  }
 }

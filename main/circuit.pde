@@ -42,6 +42,9 @@ class Circuit {
     textureMode(IMAGE);
     textureWrap(REPEAT);
     
+    specular(150, 150, 150);
+    shininess(5);
+    
     beginShape(TRIANGLE_STRIP);
     texture(roadTile);
     

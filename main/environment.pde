@@ -13,19 +13,20 @@ void updateLighting(boolean night) {
 }
 
 void lightMoon() {
-  ambientLight(180, 180, 230);
+  // ambientLight(180, 180, 230);
   directionalLight(100, 100, 140, 0, 1000, -1);
 }
 
 void lightSun() {
-  ambientLight(255, 255, 200);
-  directionalLight(255, 255, 200, 0, -1000, -1);
+  // ambientLight(255, 255, 200);
+  // directionalLight(255, 255, 200, 0, -1000, -1);
 }
 
 void drawSkybox(float size) {
   noStroke();
   float d = size / 2;
-  
+  specular(100, 100, 100);
+  shininess(1);
   // Front
   normal(0, 0, -1);
   beginShape(QUADS);
