@@ -27,7 +27,7 @@ class Car {
     this.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
   }
 
-  void update(Circuit c) {
+  void update(Circuit c, CarP police) { //on peut supprimer police
     // controls
     if(isUp)        speed = 5.8;
     else if(isDown) speed = -2.5;
@@ -56,7 +56,18 @@ class Car {
     if(collision) { pos.y = oldY; vy = 0; }
     else { vy += g; pos.y += vy; }
 
-    if(pos.y > 100) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
+    if(pos.y > 100) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } 
+
+    /**
+    PVector diff = PVector.sub(pos, police.pos);
+        float collDist = diff.mag();
+        int maxDist = 30; 
+        if (collDist < maxDist) {
+            diff.normalize();
+            pos.add(PVector.mult(diff, maxDist - collDist)); // push back
+        }// reset
+
+    */
   }
 
   void display() {
