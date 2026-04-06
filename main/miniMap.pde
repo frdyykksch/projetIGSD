@@ -52,6 +52,7 @@ class MiniMap {
         minimapBuffer.endShape(CLOSE);
         minimapBuffer.hint(ENABLE_DEPTH_TEST);
         minimapBuffer.endDraw();
+        println(c.samplePoints.size());
     }
     
     void drawMinimap(float x, float y, boolean isNight, Car car1, ArrayList<CarP> carsPolice) {
