@@ -1,5 +1,5 @@
 
-class MiniMap {
+class Minimap {
     PGraphics minimapBuffer;
     Circuit c;
     ArrayList<PVector> points;
@@ -7,7 +7,7 @@ class MiniMap {
     float mapSize = 150;
     float mapX, mapY;
     
-    MiniMap(Circuit c) {
+    Minimap(Circuit c) {
         this.c = c;
         this.points = c.samplePoints;
         minimapBuffer = createGraphics(150, 150);
@@ -55,7 +55,7 @@ class MiniMap {
         println(c.samplePoints.size());
     }
     
-    void drawMinimap(float x, float y, boolean isNight, Car car1, ArrayList<CarP> carsPolice) {
+    void drawMinimap(float x, float y, boolean isNight, Car car1, ArrayList<Police> carsPolice) {
         hint(DISABLE_DEPTH_TEST);
         
         // Draw the pre-rendered circuit map
@@ -66,12 +66,12 @@ class MiniMap {
         strokeWeight(2);
         pushMatrix();
         translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale);
-        rotate(car1.angle);
+        rotate(car1.yaw);
         triangle(-10, -6, -10, 6, 10, 0);
         popMatrix();
         
         // Draw all police cars in the arrayList
-        for (CarP cp : carsPolice) {
+        for (Police cp : carsPolice) {
             if (isNight) {
                 fill(255, 255, 255);
             } else {
@@ -80,7 +80,7 @@ class MiniMap {
             strokeWeight(2);
             pushMatrix();
             translate(x + (cp.pos.x - minX) * scale, y + (cp.pos.z - minZ) * scale);
-            rotate(cp.angle);
+            rotate(cp.yaw);
             triangle(-10, -6, -10, 6, 10, 0);
             popMatrix();
         }
