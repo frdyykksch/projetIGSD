@@ -132,4 +132,4 @@ void setControl(int code, boolean state) {
   if (code == RIGHT || code == 'd' || code == 'D') car1.isRight = state;
   if (code == UP || code == 'w' || code == 'W')   car1.isUp = state;
   if (code == DOWN || code == 's' || code == 'S') car1.isDown = state;
-} 
+}

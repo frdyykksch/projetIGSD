@@ -3,7 +3,7 @@ class Circuit {
   ArrayList<PVector> points;
   ArrayList<PVector> samplePoints;
   float largeurRoute;
-  int segmentsParCourbe = 20;
+  int segmentsParCourbe = 1000;
   PImage roadTile;
 
   Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile) {
