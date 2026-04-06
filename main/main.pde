@@ -7,7 +7,8 @@ ArrayList<CarP> carsPolice;
 Car car1;
 MiniMap minimap;
 
-boolean isNight = false;
+boolean isNight = true;
+boolean firstPerson = false;
 PVector startPos;
 
 float cameraHeight = 60;
@@ -25,11 +26,11 @@ void setup() {
   startPos = circuitF1.getSpawnPoint();
   cars = new ArrayList<Car>();
   carsPolice = new ArrayList<CarP>();
-  car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
+  car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\mainCar2\\insideCar.obj");
   cars.add(car1);
   car1.angle = circuitF1.getSpawnAngle();
 
-  CarP car2 = new CarP(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
+  CarP car2 = new CarP(this, startPos.x, startPos.y, startPos.z, 3, "..\\resources\\PoliceCar.obj");
   carsPolice.add(car2);
   car2.angle = circuitF1.getSpawnAngle();
 
@@ -82,12 +83,22 @@ void setupCamera(Car targetCar) {
   float camY = targetCar.pos.y - cameraHeight;
   float camZ = targetCar.pos.z - sin(targetCar.angle) * cameraDistance;
 
-  float lookAheadDist = 50;
-  float lookX = targetCar.pos.x + cos(targetCar.angle) * lookAheadDist;
-  float lookY = targetCar.pos.y + cameraPitch * 200;
-  float lookZ = targetCar.pos.z + sin(targetCar.angle) * lookAheadDist;
-
-  camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
+  if (firstPerson) {
+    float lookAheadDist = 5;
+    camX = targetCar.pos.x- 1 * cos(targetCar.angle);
+    camY = targetCar.pos.y - 11;
+    camZ = targetCar.pos.z;
+    float lookX = targetCar.pos.x + cos(targetCar.angle) * lookAheadDist;
+    float lookY = camY + cameraPitch * 5;
+    float lookZ = targetCar.pos.z + sin(targetCar.angle) * lookAheadDist;
+    camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
+  } else {
+    float lookAheadDist = 50;
+    float lookX = targetCar.pos.x + cos(targetCar.angle) * lookAheadDist;
+    float lookY = targetCar.pos.y + cameraPitch * 200;
+    float lookZ = targetCar.pos.z + sin(targetCar.angle) * lookAheadDist;
+    camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
+  }
   perspective(PI / 2.5, float(width) / float(height), 1, 10000);
 }
 
@@ -95,6 +106,11 @@ void keyPressed() {
   if (key == 'n' || key == 'N') {
     isNight = !isNight;
     environment.setNightMode(isNight);
+    return;
+  }
+  if (key == 'q' || key == 'Q') {
+    firstPerson = !firstPerson;
+    return;
   }
   setControl(keyCode, true);
   if (key == 'e' || key == 'E') {
@@ -103,6 +119,7 @@ void keyPressed() {
 }
 
 void keyReleased() {
+  if (key == 'q' || key == 'Q') return;
   setControl(keyCode, false);
 }
 

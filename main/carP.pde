@@ -22,11 +22,11 @@ class CarP {
   int steerTimer = 0;
   int steerInterval = 8;
 
-    CarP(PApplet parent, float x, float y, float z, String modelPath) {
+    CarP(PApplet parent, float x, float y, float z, int speed, String modelPath) {
         this.pos = new PVector(x, y, z);
         this.angle = 0;
         this.desiredAngle = 0;
-        this.speed = 3;
+        this.speed = speed;
         this.oldY = y;
         this.vy = 0;
         this.model = loadShape(modelPath);
