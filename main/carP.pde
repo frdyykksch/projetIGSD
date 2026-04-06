@@ -22,77 +22,63 @@ class CarP {
     CarP(PApplet parent, float x, float y, float z, String modelPath) {
         this.pos = new PVector(x, y, z);
         this.angle = 0;
-        this.speed = 3;
+        this.speed = 10;
         this.oldY = y;
         this.vy = 0;
         this.model = loadShape(modelPath);
     }
     void updateP(Circuit c, Car player) {
 
-        float minDist = Float.MAX_VALUE;
-        int closestIndex = 0;
-        
-        for (int i = 0; i < c.samplePoints.size(); i++) {
-            PVector point = c.samplePoints.get(i);
-            float dist = PVector.dist(pos, point);
-            if (dist < minDist) {
-                minDist = dist;
-                closestIndex = i;
-            }
-        }
-        int lookAheadPoints = 8;
-        targetIndex = (closestIndex + lookAheadPoints) % c.samplePoints.size();
+        if (targetIndex >= c.samplePoints.size()) targetIndex = 0;
         PVector target = c.samplePoints.get(targetIndex);
-
         PVector dir = PVector.sub(target, pos);
-        float distToTarget = dir.mag();
+        float distSquared = dir.x * dir.x + dir.z * dir.z; // avoid expensive mag() calculation
 
-        if (distToTarget < 500) {
+        if (distSquared < 3600) { // 60 squared
             targetIndex = (targetIndex + 1) % c.samplePoints.size();
-            target = c.samplePoints.get(targetIndex);
-            dir = PVector.sub(target, pos);
+        } else {
+            dir.normalize();
+            angle = atan2(dir.z, dir.x);
+            pos.x += (speed) * cos(angle);
+            pos.z += (speed) * sin(angle);
         }
         
-
+        // Get proper road Y position
         float roadY = c.getRoadY(pos.x, pos.z);
         
-        float lookAheadDist = 60;
-        float nextX = pos.x + cos(angle) * lookAheadDist;
-        float nextZ = pos.z + sin(angle) * lookAheadDist;
+        // pitch - reduced lookAhead for better performance
+        float lookAhead = 10;
+        float nextX = pos.x + cos(angle) * lookAhead;
+        float nextZ = pos.z + sin(angle) * lookAhead;
         float nextRoadY = c.getRoadY(nextX, nextZ);
-        float targetPitch = atan2(nextRoadY - roadY, lookAheadDist);
-        pitch = lerp(pitch, targetPitch, 0.2);
+        float targetPitch = atan2(nextRoadY - roadY, lookAhead);
+        pitch = lerp(pitch, targetPitch, 0.15);
         
-        // angle
-        float targetAngle = atan2(dir.z, dir.x);
-        angle = lerp(angle, targetAngle, 0.05);
-
-        pos.x += speed * cos(angle);
-        pos.z += speed * sin(angle);
+        // gravity and collision
         oldY = pos.y;
-        
         if(c.isCollision(pos.x, pos.y, pos.z)) {
-            pos.y = roadY; 
+            pos.y = roadY;
             vy = 0;
         } else { 
             vy += g; 
             pos.y += vy; 
         }
 
-        if(pos.y > 100) { 
+        if(pos.y > 200) { 
             pos.set(startPos); 
             vy = 0;
             oldY = 0;
-            angle = c.getSpawnAngle(); 
-            targetIndex = 0; 
+            angle = 0;
+            targetIndex = 0;
         } 
 
+        // car collision
         PVector diff = PVector.sub(pos, player.pos);
-        float collDist = diff.mag();
+        float collDistSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
         int maxDist = 35; 
-        if (collDist < maxDist) {
+        if (collDistSquared < maxDist * maxDist) {
             diff.normalize();
-            pos.add(PVector.mult(diff, maxDist - collDist)); // push back
+            pos.add(PVector.mult(diff, maxDist - sqrt(collDistSquared)));
         }
     }
     void backLightsP() {
