@@ -26,7 +26,7 @@ void setup() {
   startPos = circuitF1.getSpawnPoint();
   cars = new ArrayList<Car>();
   carsPolice = new ArrayList<CarP>();
-  car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\mainCar2\\insideCar.obj");
+  car1 = new Car(this, startPos.x, startPos.y-500, startPos.z-20, "..\\resources\\mainCar2\\insideCar.obj");
   cars.add(car1);
   car1.angle = circuitF1.getSpawnAngle();
 
@@ -84,12 +84,12 @@ void setupCamera(Car targetCar) {
   float camZ = targetCar.pos.z - sin(targetCar.angle) * cameraDistance;
 
   if (firstPerson) {
-    float lookAheadDist = 5;
+    float lookAheadDist = 100;
     camX = targetCar.pos.x- 1 * cos(targetCar.angle);
     camY = targetCar.pos.y - 11;
     camZ = targetCar.pos.z;
     float lookX = targetCar.pos.x + cos(targetCar.angle) * lookAheadDist;
-    float lookY = camY + cameraPitch * 5;
+    float lookY = camY + cameraPitch * 30;
     float lookZ = targetCar.pos.z + sin(targetCar.angle) * lookAheadDist;
     camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
   } else {
@@ -130,4 +130,14 @@ void setControl(int code, boolean state) {
   if (code == UP || code == 'w' || code == 'W')   car1.isUp = state;
   if (code == DOWN || code == 's' || code == 'S') car1.isDown = state;
   if (code == 32) car1.isSpace = state;
-} 
+}
+
+void mouseMoved() {
+  if (firstPerson) {
+    // Adjust camera pitch based on mouse Y position (vertical look)
+    float centerY = height / 2.0;
+    cameraPitch = (pmouseY - centerY) * 0.001; // Scale to reasonable pitch values
+    // Clamp pitch to prevent camera flipping
+    cameraPitch = constrain(cameraPitch, -PI/4, PI/4);
+  }
+}

@@ -1,9 +1,11 @@
 class CarP {
   PVector pos;
+  PVector spawnPos;
   float oldY; // pour la collision
   float angle;
   float speed;
   float pitch = 0;
+  float yaw; // sync with angle
 
 
   float tilt = 0;
@@ -24,6 +26,7 @@ class CarP {
 
     CarP(PApplet parent, float x, float y, float z, int speed, String modelPath) {
         this.pos = new PVector(x, y, z);
+        this.spawnPos = new PVector(x, y, z);
         this.angle = 0;
         this.desiredAngle = 0;
         this.speed = speed;
@@ -97,7 +100,7 @@ class CarP {
         }
 
         if(pos.y > 200) { 
-            pos.set(startPos); 
+            pos.set(spawnPos); 
             vy = 0;
             oldY = 0;
             angle = 0;

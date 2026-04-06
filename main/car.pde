@@ -1,15 +1,18 @@
 class Car {
-  PVector pos;
-  float oldY; // for collison
-  float angle; // yaw
-  float speed;
+  float FWD_SPEED = 5.8;
+  float BWD_SPEED = -2.5;
+  float STD_YAW = 0.04;
 
+  PVector pos;
+  PVector spawnPos;
+  float angle;
+  float oldY;
+  float speed;
   float roll = 0;
   float pitch = 0;
-
-  float vy; // gravity, collsision
+  float vy = 0;
   float g = 0.125;
-
+  
   PShape model;
   SoundFile file;
 
@@ -19,6 +22,7 @@ class Car {
 
   Car(PApplet parent, float x, float z, float speed, String modelPath) {
     this.pos = new PVector(x, 0, z);
+    this.spawnPos = new PVector(x, 0, z);
     this.angle = 0;
     this.speed = speed;
     this.oldY = 0;
@@ -27,14 +31,14 @@ class Car {
     this.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
   }
 
-  void update(Circuit c, CarP police) { //on peut supprimer police
+  void update(Circuit c, CarP police) { //can be removed
     // controls
-    if(isUp) { speed = 5.8; }
-    else if(isDown) { speed = -2.5; }
+    if(isUp) { speed = FWD_SPEED; }
+    else if(isDown) { speed = BWD_SPEED; }
     else speed *= 0.9;
 
-    if(isLeft) {        angle -= 0.06;    roll = -0.15 * (speed / 6.0); }
-    else if(isRight) {  angle += 0.06;    roll = 0.15 * (speed / 6.0); }
+    if(isLeft) {        angle -= STD_YAW;    roll = -0.15 * (speed / 6.0); }
+    else if(isRight) {  angle += STD_YAW;    roll = 0.15 * (speed / 6.0); }
     else { roll = lerp(roll, 0, 0.1); }
 
     float roadY = c.getRoadY(pos.x, pos.y, pos.z);
@@ -61,27 +65,23 @@ class Car {
     oldY = pos.y;
 
     if(c.isCollision(pos.x, pos.y, pos.z)) {
-      // float roadY = c.getRoadY(pos.x, pos.z);
       pos.y = roadY;
       vy = 0;
     } else { vy += g; pos.y += vy; }
 
-    if(pos.y > 500) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
+    if(pos.y > 500) { pos.set(spawnPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
   }
-
+  
   void display() {
     pushMatrix();
-    
     translate(pos.x, pos.y, pos.z);
     rotateX(PI);
     rotateY(PI);
     rotateY(angle);
     rotateX(roll);
     rotateZ(pitch);
-
     scale(10);
     shape(model);
-    
     popMatrix();
   }
 
@@ -89,24 +89,19 @@ class Car {
     if (!lightOn) return;
     if (!isNight) return;
 
-    float lightDistance = 25; // Distance behind the car
+    float lightDistance = 25;
     float backLightX = pos.x - lightDistance * cos(angle);
     float backLightZ = pos.z - lightDistance * sin(angle);
-    float backLightY = pos.y; // Slightly above car for better illumination
+    float backLightY = pos.y;
     pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
     pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
   }
 
   void frontLights() {
-    // failed
+    return;
   }
 
   void toggleLights() {
     lightOn = !lightOn;
-  }
-  void carHorn() {
-    if (!file.isPlaying()) {
-      file.play();
-    }
   }
 }
