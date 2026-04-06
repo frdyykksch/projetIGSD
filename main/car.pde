@@ -11,19 +11,23 @@ class Car {
   float g = 0.125;
 
   PShape model;
+  SoundFile file;
 
-  boolean isLeft, isRight, isUp, isDown; // movement
+  boolean isLeft, isRight, isUp, isDown, isSpace; // movement
+  boolean lightOn = false;
+  boolean soundPlayed = false;
 
-  Car(float x, float z, float speed, String modelPath) {
+  Car(PApplet parent, float x, float z, float speed, String modelPath) {
     this.pos = new PVector(x, 0, z);
     this.angle = 0;
     this.speed = speed;
     this.oldY = 0;
     this.vy = 0;
     this.model = loadShape(modelPath);
+    this.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
   }
 
-  void update(Circuit c) {
+  void update(Circuit c, CarP police) { //on peut supprimer police
     // controls
     if(isUp) { speed = 5.8; }
     else if(isDown) { speed = -2.5; }
@@ -42,6 +46,14 @@ class Car {
     float nextRoadY = c.getRoadY(nextX, nextZ);
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
+
+    // sound
+    if (isSpace && !soundPlayed) {
+      file.play();
+      soundPlayed = true;
+    } else if (!isSpace) {
+      soundPlayed = false;
+    }
 
     // movement
     pos.x += speed * cos(angle);
@@ -74,16 +86,23 @@ class Car {
   }
 
   void backLights() {
+    if (!lightOn) return;
     if (!isNight) return;
 
-    // PRIMARY SOLUTION: Position pointLight directly behind car using angle
     float lightDistance = 25; // Distance behind the car
     float backLightX = pos.x - lightDistance * cos(angle);
     float backLightZ = pos.z - lightDistance * sin(angle);
     float backLightY = pos.y; // Slightly above car for better illumination
-    
-    //pointLight(255, 0, 0, backLightX, backLightY-2, backLightZ);
     pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
     pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
+  }
+
+  void toggleLights() {
+    lightOn = !lightOn;
+  }
+  void carHorn() {
+    if (!file.isPlaying()) {
+      file.play();
+    }
   }
 }

@@ -1,9 +1,13 @@
+import processing.sound.*;
+
 Environment environment;
 Circuit circuitF1;
 ArrayList<Car> cars;
+ArrayList<CarP> carsPolice;
 Car car1;
+CarP car2;
 
-boolean isNight = false;
+boolean isNight = true;
 PVector startPos;
 
 float cameraHeight = 60;
@@ -22,9 +26,14 @@ void setup() {
 
   startPos = new PVector(-600, 0, 0);
   cars = new ArrayList<Car>();
-  car1 = new Car(startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
+  carsPolice = new ArrayList<CarP>();
+  car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
   cars.add(car1);
   car1.angle = circuitF1.getSpawnAngle();
+
+  car2 = new CarP(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
+  carsPolice.add(car2);
+  car2.angle = circuitF1.getSpawnAngle();
 
   minimapBuffer = createGraphics(150, 150);
 }
@@ -39,8 +48,14 @@ void draw() {
 
   for (Car c : cars) {
     c.backLights();
-    c.update(circuitF1);
+    c.update(circuitF1, car2);
     c.display();
+  }
+
+  for (CarP cp : carsPolice) {
+    cp.backLightsP();
+    cp.updateP(circuitF1, car1);
+    cp.displayP();
   }
 
   environment.drawSkybox(4000);
@@ -69,7 +84,8 @@ void drawMinimap(Circuit c, float size, float x, float y) {
         // fond
         fill(0, 0, 0, 100);
         noStroke();
-        rect(x, y, size, size - 50);
+        rect(x, y, size, size-80);
+        
         
         // cirucit
         stroke(255);
@@ -82,12 +98,26 @@ void drawMinimap(Circuit c, float size, float x, float y) {
         
         // car
         fill(255, 0, 0);
-        noStroke();
+        strokeWeight(2);
         pushMatrix();
-        translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale); // POURQUOI LA VOITURE ELLE EST PAS AU DESSUS??!?!
+        translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale);
         rotate(car1.angle);
         triangle(-10, -6, -10, 6, 10, 0);
         popMatrix();
+
+        // la police 
+        if (isNight){
+        fill(255, 255, 255);
+        }else{
+        fill(0, 0, 255);
+        }
+        strokeWeight(2);
+        pushMatrix();
+        translate(x + (car2.pos.x - minX) * scale, y + (car2.pos.z - minZ) * scale);
+        rotate(car2.angle);
+        triangle(-10, -6, -10, 6, 10, 0);
+        popMatrix();
+
 
   hint(ENABLE_DEPTH_TEST);
 }
@@ -121,15 +151,20 @@ void keyPressed() {
     environment.setNightMode(isNight);
   }
   setControl(keyCode, true);
+  if (key == 'e' || key == 'E') {
+    car1.toggleLights();
+  }
 }
 
 void keyReleased() {
   setControl(keyCode, false);
 }
 
+
 void setControl(int code, boolean state) {
   if (code == LEFT || code == 'a' || code == 'A')  car1.isLeft = state;
   if (code == RIGHT || code == 'd' || code == 'D') car1.isRight = state;
   if (code == UP || code == 'w' || code == 'W')   car1.isUp = state;
   if (code == DOWN || code == 's' || code == 'S') car1.isDown = state;
-}
+  if (code == 32) car1.isSpace = state;
+} 
