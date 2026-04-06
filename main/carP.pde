@@ -45,14 +45,14 @@ class CarP {
         float delta = targetAngle - angle;
         while (delta > PI) delta -= TWO_PI;
         while (delta < -PI) delta += TWO_PI;
-        angle += delta * 0.05; // smooth progressive rotation
+        angle += delta * 0.9; // smooth progressive rotation
         
         // movement - simple like Car class
         pos.x += speed * cos(angle);
         pos.z += speed * sin(angle);
         oldY = pos.y;
         // Get road Y position
-        float roadY = c.getRoadY(pos.x, pos.z);
+        float roadY = c.getRoadY(pos.x, pos.y, pos.z);
         
         // gravity and collision
         if(c.isCollision(pos.x, pos.y, pos.z)) {

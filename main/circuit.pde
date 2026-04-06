@@ -15,18 +15,19 @@ class Circuit {
   Circuit() {
     points = new ArrayList<PVector>();
 
-    points.add(new PVector(0, 0, 0));
-    points.add(new PVector(500, -50, 500));
+    points.add(new PVector(-500, 100, -1000));
+    points.add(new PVector(500, 75, 500));
     points.add(new PVector(1500, -30, 750));
     points.add(new PVector(1000, -50, 1500));
-    points.add(new PVector(0, -75, 1250));
-    points.add(new PVector(-1000, -125, 1500));
-    points.add(new PVector(0, -125, 3000));
-    points.add(new PVector(2000, -80, 2500));
+    points.add(new PVector(0, -150, 1250));
+    points.add(new PVector(-1000, 100, 1500));
+    points.add(new PVector(0, -350, 3000));
+    points.add(new PVector(2000, -160, 2500));
     points.add(new PVector(3000, -30, 2000));
-    points.add(new PVector(2000, -65, 1000));
+    points.add(new PVector(2000, 65, 1000));
     points.add(new PVector(3000, -45, -500));
-    points.add(new PVector(1000, -65, -1000));
+    points.add(new PVector(1000, -125, -1000));
+    points.add(new PVector(-500, -125, 500));
 
     this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
@@ -131,25 +132,32 @@ class Circuit {
     );
   }
 
-  boolean isCollision(float x, float y, float z) {
-    if(samplePoints == null) { return false; }
-      for(PVector p : samplePoints) {
-          float dist = dist(x, y, z, p.x, p.y, p.z);
-          if(dist < largeurRoute && p.y >= y) { return true; }
-      } return false;
+  boolean isCollision(float x, float carY, float z) {
+  if (samplePoints == null) return false;
+  float yTolerance = 150;
+  for (PVector p : samplePoints) {
+    if (abs(p.y - carY) > yTolerance) continue;
+    float dxz = dist(x, 0, z, p.x, 0, p.z);
+    if (dxz < largeurRoute) return true;
   }
+  return false;
+}
 
-  float getRoadY(float x, float z) {
+  float getRoadY(float x, float carY, float z) {
     float closestDist = Float.MAX_VALUE;
-    float closestY = 0;
-    for(PVector p : samplePoints) {
+    float closestY = carY; // fallback: don't move if no road found
+    float yTolerance = 150; // less than the ~225 gap between overlapping roads
+  
+    for (PVector p : samplePoints) {
+      // skip points on the other level
+      if (abs(p.y - carY) > yTolerance) continue;
+      
       float d = dist(x, 0, z, p.x, 0, p.z);
-      if(d < closestDist) {
+      if (d < closestDist) {
         closestDist = d;
         closestY = p.y;
       }
     }
-    println(closestY);
     return closestY;
   }
 

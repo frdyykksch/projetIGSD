@@ -37,13 +37,13 @@ class Car {
     else if(isRight) {  angle += 0.06;    roll = 0.15 * (speed / 6.0); }
     else { roll = lerp(roll, 0, 0.1); }
 
-    float roadY = c.getRoadY(pos.x, pos.z);
+    float roadY = c.getRoadY(pos.x, pos.y, pos.z);
     
     // pitch
     float lookAhead = 10;
     float nextX = pos.x + cos(angle) * lookAhead;
     float nextZ = pos.z + sin(angle) * lookAhead;
-    float nextRoadY = c.getRoadY(nextX, nextZ);
+    float nextRoadY = c.getRoadY(nextX, pos.y, nextZ);
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
 
