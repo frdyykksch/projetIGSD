@@ -22,40 +22,39 @@ class CarP {
     CarP(PApplet parent, float x, float y, float z, String modelPath) {
         this.pos = new PVector(x, y, z);
         this.angle = 0;
-        this.speed = 10;
+        this.speed = 3;
         this.oldY = y;
         this.vy = 0;
         this.model = loadShape(modelPath);
     }
     void updateP(Circuit c, Car player) {
-
+        // Simple AI: follow waypoints
         if (targetIndex >= c.samplePoints.size()) targetIndex = 0;
         PVector target = c.samplePoints.get(targetIndex);
         PVector dir = PVector.sub(target, pos);
-        float distSquared = dir.x * dir.x + dir.z * dir.z; // avoid expensive mag() calculation
+        float distSquared = dir.x * dir.x + dir.z * dir.z;
 
         if (distSquared < 3600) { // 60 squared
             targetIndex = (targetIndex + 1) % c.samplePoints.size();
-        } else {
-            dir.normalize();
-            angle = atan2(dir.z, dir.x);
-            pos.x += (speed) * cos(angle);
-            pos.z += (speed) * sin(angle);
+            target = c.samplePoints.get(targetIndex);
+            dir = PVector.sub(target, pos);
         }
+
+        dir.normalize();
+        float targetAngle = atan2(dir.z, dir.x);
+        float delta = targetAngle - angle;
+        while (delta > PI) delta -= TWO_PI;
+        while (delta < -PI) delta += TWO_PI;
+        angle += delta * 0.05; // smooth progressive rotation
         
-        // Get proper road Y position
+        // movement - simple like Car class
+        pos.x += speed * cos(angle);
+        pos.z += speed * sin(angle);
+        oldY = pos.y;
+        // Get road Y position
         float roadY = c.getRoadY(pos.x, pos.z);
         
-        // pitch - reduced lookAhead for better performance
-        float lookAhead = 10;
-        float nextX = pos.x + cos(angle) * lookAhead;
-        float nextZ = pos.z + sin(angle) * lookAhead;
-        float nextRoadY = c.getRoadY(nextX, nextZ);
-        float targetPitch = atan2(nextRoadY - roadY, lookAhead);
-        pitch = lerp(pitch, targetPitch, 0.15);
-        
         // gravity and collision
-        oldY = pos.y;
         if(c.isCollision(pos.x, pos.y, pos.z)) {
             pos.y = roadY;
             vy = 0;
