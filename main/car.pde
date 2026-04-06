@@ -97,6 +97,10 @@ class Car {
     pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
   }
 
+  void frontLights() {
+    // failed
+  }
+
   void toggleLights() {
     lightOn = !lightOn;
   }

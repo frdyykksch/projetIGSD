@@ -48,6 +48,7 @@ void draw() {
 
   for (Car c : cars) {
     c.backLights();
+    // c.frontLights();
     c.update(circuitF1, carsPolice.size() > 0 ? carsPolice.get(0) : null);
     c.display();
   }
