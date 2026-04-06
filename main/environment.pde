@@ -1,5 +1,6 @@
 class Environment {
-  PImage cube, cubeNight;
+  PImage cube;
+  PImage cubeNight;
   PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 
   Environment(boolean night) {
@@ -28,9 +29,9 @@ class Environment {
   void setNightMode(boolean night) {
     PImage textureImage;
     if (night) {
-      textureImage = loadImage("..\\resources\\night.jpg");
+      textureImage = cubeNight;
     } else {
-      textureImage = loadImage("..\\resources\\desert.png");
+      textureImage = cube;
     }
 
     int w = textureImage.width / 4;

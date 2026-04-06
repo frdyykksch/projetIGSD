@@ -40,14 +40,14 @@ class CarP {
                 closestIndex = i;
             }
         }
-        int lookAheadPoints = 4;
+        int lookAheadPoints = 8;
         targetIndex = (closestIndex + lookAheadPoints) % c.samplePoints.size();
         PVector target = c.samplePoints.get(targetIndex);
 
         PVector dir = PVector.sub(target, pos);
         float distToTarget = dir.mag();
 
-        if (distToTarget < 50) {
+        if (distToTarget < 500) {
             targetIndex = (targetIndex + 1) % c.samplePoints.size();
             target = c.samplePoints.get(targetIndex);
             dir = PVector.sub(target, pos);
@@ -56,7 +56,7 @@ class CarP {
 
         float roadY = c.getRoadY(pos.x, pos.z);
         
-        float lookAheadDist = 30;
+        float lookAheadDist = 60;
         float nextX = pos.x + cos(angle) * lookAheadDist;
         float nextZ = pos.z + sin(angle) * lookAheadDist;
         float nextRoadY = c.getRoadY(nextX, nextZ);
