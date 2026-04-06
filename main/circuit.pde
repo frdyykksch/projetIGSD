@@ -3,7 +3,7 @@ class Circuit {
   ArrayList<PVector> points;
   ArrayList<PVector> samplePoints;
   float largeurRoute;
-  int segmentsParCourbe = 20;
+  int segmentsParCourbe = 1000;
   PImage roadTile;
 
   Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile) {
@@ -13,26 +13,41 @@ class Circuit {
 
   Circuit() {
     points = new ArrayList<PVector>();
-    points.add(new PVector(-600, 0, 0));
-    points.add(new PVector(-450, 0, -240));
-    points.add(new PVector(-380, 0, -330));
-    points.add(new PVector(-260, 0, -380));
-    points.add(new PVector(-100, 0, -200));
-    points.add(new PVector(-20,  0, -160));
-    points.add(new PVector( 120, 0, -190));
-    points.add(new PVector( 260, 0, -150));
-    points.add(new PVector( 380, 0,  -60));
-    points.add(new PVector( 420, 0,   50));
-    points.add(new PVector( 380, 0,  170));
-    points.add(new PVector( 280, 0,  250));
-    points.add(new PVector( 140, 0,  320));
-    points.add(new PVector( -20, 0,  360));
-    points.add(new PVector(-180, 0,  330));
-    points.add(new PVector(-340, 0,  260));
-    points.add(new PVector(-460, 0,  160));
-    points.add(new PVector(-650, 0,  110));
+    // points.add(new PVector(-600, 0, 0));
+    // points.add(new PVector(-450, 0, -240));
+    // points.add(new PVector(-380, 0, -330));
+    // points.add(new PVector(-260, 0, -380));
+    // points.add(new PVector(-100, 0, -200));
+    // points.add(new PVector(-20,  0, -160));
+    // points.add(new PVector( 120, 0, -190));
+    // points.add(new PVector( 260, 0, -150));
+    // points.add(new PVector( 380, 0,  -60));
+    // points.add(new PVector( 420, 0,   50));
+    // points.add(new PVector( 380, 0,  170));
+    // points.add(new PVector( 280, 0,  250));
+    // points.add(new PVector( 140, 0,  320));
+    // points.add(new PVector( -20, 0,  360));
+    // points.add(new PVector(-180, 0,  330));
+    // points.add(new PVector(-340, 0,  260));
+    // points.add(new PVector(-460, 0,  160));
+    // points.add(new PVector(-650, 0,  110));
+    points.add(new PVector(-600,   0,    0));
+    points.add(new PVector(-450,  -40, -200));
+    points.add(new PVector(-300,  -80, -350));
+    points.add(new PVector(-100,  -80, -420));
+    points.add(new PVector( 100,  -40, -380));
+    points.add(new PVector( 250,    0, -280));
+    points.add(new PVector( 400,   40, -150));
+    points.add(new PVector( 500,   80,    0));
+    points.add(new PVector( 450,   80,  180));
+    points.add(new PVector( 300,   40,  320));
+    points.add(new PVector( 100,    0,  400));
+    points.add(new PVector(-100,  -40,  380));
+    points.add(new PVector(-300,  -80,  300));
+    points.add(new PVector(-480,  -40,  180));
+    points.add(new PVector(-580,    0,   80));
 
-    this.largeurRoute = 80;
+    this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
     roadTile = loadImage("..\\resources\\roadTile.jpg");
   }
@@ -52,11 +67,11 @@ class Circuit {
     float vScale = roadTile.height / 80.0;
     int m = samplePoints.size();
     
-    pushMatrix();
     for(int i = 0; i < m; i++) {
 
       PVector pt = samplePoints.get(i);
       PVector nextPt = samplePoints.get((i + 1) % m);
+
       PVector tangent = PVector.sub(nextPt, pt);
       tangent.normalize();
       
@@ -71,9 +86,18 @@ class Circuit {
       vertex(right.x, right.y, right.z, roadTile.width, vTex);
       
       vTex += PVector.dist(pt, nextPt) * vScale;
-    } popMatrix();
-    
-    endShape(CLOSE);
+    }
+    PVector pStart = samplePoints.get(0);
+    PVector pNext = samplePoints.get(1);
+    PVector tangentStart = PVector.sub(pNext, pStart);
+    tangentStart.normalize();
+    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x);
+    nStart.normalize().mult(largeurRoute);
+
+    vertex(pStart.x - nStart.x, pStart.y, pStart.z - nStart.z, 0, vTex);
+    vertex(pStart.x + nStart.x, pStart.y, pStart.z + nStart.z, roadTile.width, vTex);
+      
+    endShape();
     
   }
 
@@ -87,12 +111,13 @@ class Circuit {
       PVector p2 = points.get((i + 1) % n);
       PVector p3 = points.get((i + 2) % n);
 
-      for (int s = 0; s < stepsPerSegment; s++) {
+      for(int s = 0; s < stepsPerSegment; s++) {
         float t = s / (float) stepsPerSegment;
         sample.add(catmullRomPoint(p0, p1, p2, p3, t));
       }
     }
-    sample.add(sample.get(0).copy());
+    // sample.add(sample.get(0).copy()); // removed because snap last to first wanst good
+    // println(sample);
     return sample;
   }
 
@@ -125,8 +150,22 @@ class Circuit {
     if(samplePoints == null) { return false; }
       for(PVector p : samplePoints) {
           float dist = dist(x, y, z, p.x, p.y, p.z);
-          if(dist < largeurRoute && y <= p.y) { return true; }
+          if(dist < largeurRoute) { return true; }
       } return false;
+  }
+
+  float getRoadY(float x, float z) {
+    float closestDist = Float.MAX_VALUE;
+    float closestY = 0;
+    for(PVector p : samplePoints) {
+      float d = dist(x, 0, z, p.x, 0, p.z);
+      if(d < closestDist) {
+        closestDist = d;
+        closestY = p.y;
+      }
+    }
+    println(closestY);
+    return closestY;
   }
 
   PVector getSpawnPoint() {

@@ -63,14 +63,14 @@ void draw() {
   popMatrix();
 
   // Draw minimap (top-left corner)
-  drawMinimap(circuitF1, 300, -100, -100);
+  drawMinimap(circuitF1, 250, -100, -100);
 }
 
 void drawMinimap(Circuit c, float size, float x, float y) {
   ArrayList<PVector> points = c.samplePoints;
 
   // map/circuit boundaries
-  float minX = points.get(0).x; float maxX = points.get(0).x; 
+  float minX = points.get(0).x; float maxX = points.get(0).x;
   float minZ = points.get(0).z; float maxZ = points.get(0).z;
   for(PVector p : points) {
     minX = min(minX, p.x); maxX = max(maxX, p.x);
@@ -93,7 +93,7 @@ void drawMinimap(Circuit c, float size, float x, float y) {
         noFill();
         beginShape();
         for (PVector p : points)
-        vertex(x + (p.x - minX) * scale, y + (p.z - minZ) * scale);
+          vertex(x + (p.x - minX) * scale, y + (p.z - minZ) * scale);
         endShape(CLOSE);
         
         // car
