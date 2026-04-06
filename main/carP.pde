@@ -1,8 +1,9 @@
 class CarP {
   PVector pos;
-  float oldY; // for collison
+  float oldY; // pour la collision
   float angle;
   float speed;
+  float pitch = 0;
 
 
   float tilt = 0;
@@ -28,36 +29,64 @@ class CarP {
     }
     void updateP(Circuit c, Car player) {
 
-        if (targetIndex >= c.samplePoints.size()) targetIndex = 0;
-        PVector target = c.samplePoints.get(targetIndex);
-        PVector dir = PVector.sub(target, pos);
-        float dist = dir.mag();
-        float r1 = random(-2, 6); //tester
-
-        if (dist < 20 + r1) {
-            targetIndex = (targetIndex + 1) % c.samplePoints.size();
-            //pour faire la boucle on fait modulo
-        } else {
-            dir.normalize();
-            // Follow circuit in 3D (x, y, z)
-            angle = atan2(dir.z, dir.x);
-            pos.x += (speed) * cos(angle);
-            pos.y += (speed) * dir.y;
-            pos.z += (speed) * sin(angle);
+        float minDist = Float.MAX_VALUE;
+        int closestIndex = 0;
+        
+        for (int i = 0; i < c.samplePoints.size(); i++) {
+            PVector point = c.samplePoints.get(i);
+            float dist = PVector.dist(pos, point);
+            if (dist < minDist) {
+                minDist = dist;
+                closestIndex = i;
+            }
         }
-        // gravity and collision
-        boolean collision = c.isCollision(pos.x, pos.y, pos.z);
-        if(collision) { pos.y = oldY; vy = 0; }
-        else { vy += g; pos.y += vy; }
+        int lookAheadPoints = 4;
+        targetIndex = (closestIndex + lookAheadPoints) % c.samplePoints.size();
+        PVector target = c.samplePoints.get(targetIndex);
 
-        if(pos.y > 100) { pos.set(startPos); 
-        vy = 0;
-        oldY = 0;
-        angle = 0;
-        targetIndex = 0;
+        PVector dir = PVector.sub(target, pos);
+        float distToTarget = dir.mag();
+
+        if (distToTarget < 50) {
+            targetIndex = (targetIndex + 1) % c.samplePoints.size();
+            target = c.samplePoints.get(targetIndex);
+            dir = PVector.sub(target, pos);
+        }
+        
+
+        float roadY = c.getRoadY(pos.x, pos.z);
+        
+        float lookAheadDist = 30;
+        float nextX = pos.x + cos(angle) * lookAheadDist;
+        float nextZ = pos.z + sin(angle) * lookAheadDist;
+        float nextRoadY = c.getRoadY(nextX, nextZ);
+        float targetPitch = atan2(nextRoadY - roadY, lookAheadDist);
+        pitch = lerp(pitch, targetPitch, 0.2);
+        
+        // angle
+        float targetAngle = atan2(dir.z, dir.x);
+        angle = lerp(angle, targetAngle, 0.05);
+
+        pos.x += speed * cos(angle);
+        pos.z += speed * sin(angle);
+        oldY = pos.y;
+        
+        if(c.isCollision(pos.x, pos.y, pos.z)) {
+            pos.y = roadY; 
+            vy = 0;
+        } else { 
+            vy += g; 
+            pos.y += vy; 
+        }
+
+        if(pos.y > 100) { 
+            pos.set(startPos); 
+            vy = 0;
+            oldY = 0;
+            angle = c.getSpawnAngle(); 
+            targetIndex = 0; 
         } 
 
-        // car collision
         PVector diff = PVector.sub(pos, player.pos);
         float collDist = diff.mag();
         int maxDist = 35; 
@@ -84,6 +113,7 @@ class CarP {
     rotateY(PI);
     rotateY(angle);
     rotateX(tilt);
+    rotateZ(pitch); 
 
     scale(10);
     shape(model);
