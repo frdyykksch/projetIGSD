@@ -7,7 +7,7 @@ ArrayList<CarP> carsPolice;
 Car car1;
 MiniMap minimap;
 
-boolean isNight = true;
+boolean isNight = false;
 PVector startPos;
 
 float cameraHeight = 60;
@@ -22,7 +22,7 @@ void setup() {
   environment = new Environment(isNight);
   circuitF1 = new Circuit();
 
-  startPos = new PVector(-600, 0, 0);
+  startPos = circuitF1.getSpawnPoint();
   cars = new ArrayList<Car>();
   carsPolice = new ArrayList<CarP>();
   car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
@@ -35,6 +35,7 @@ void setup() {
 
   minimap = new MiniMap(circuitF1);
   minimap.drawCircuitMapSetup(250, -100, -100);
+  circuitF1.setupCircuit();
 }
 
 void draw() {
@@ -42,7 +43,7 @@ void draw() {
   pushMatrix();
   translate(width / 2, height / 2, 0);
   setupCamera(car1);
-  environment.drawSkybox(4000);
+  environment.drawSkybox(8000);
   environment.updateLighting(isNight);
 
   for (Car c : cars) {
@@ -57,7 +58,7 @@ void draw() {
     cp.displayP();
   }
 
-  environment.drawSkybox(4000);
+  environment.drawSkybox(32000);
   circuitF1.display();
   popMatrix();
 

@@ -66,7 +66,7 @@ class Car {
       vy = 0;
     } else { vy += g; pos.y += vy; }
 
-    if(pos.y > 200) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
+    if(pos.y > 500) { pos.set(startPos); vy = 0; oldY = 0; angle = c.getSpawnAngle(); } // reset
   }
 
   void display() {

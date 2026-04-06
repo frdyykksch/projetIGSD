@@ -17,7 +17,7 @@ class Environment {
   }
 
   void lightMoon() {
-    directionalLight(100, 100, 140, 0, 1000, -1);
+    directionalLight(120, 100, 200, 0, 1000, -1);
   }
 
   void lightSun() {
@@ -45,6 +45,7 @@ class Environment {
   }
 
   void drawSkybox(float size) {
+    pushMatrix();
     noStroke();
     textureWrap(CLAMP);
     float d = size / 2;
@@ -110,6 +111,7 @@ class Environment {
     vertex(d, d, d, texBottom.width, texBottom.height);
     vertex(-d, d, d, 0, texBottom.height);
     endShape();
+    popMatrix();
   }
 
 }
