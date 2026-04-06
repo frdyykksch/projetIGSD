@@ -2,62 +2,91 @@ class Police extends Vehicle {
     int targetIndex = 0;
 
     Police(PApplet parent, float x, float y, float z, String modelPath) {
-        super.pos = new PVector(x, y, z);
-        super.yaw = 0;
-        super.speed = 3;
-        super.oldY = y;
-        super.vy = 0;
-        super.model = loadShape(modelPath);
+    super.pos = new PVector(x, y, z);
+    super.yaw = 0;
+    super.speed = 3;
+    super.oldY = y;
+    super.vy = 0;
+    super.model = loadShape(modelPath);
     }
 
     void update(Circuit c, Car player) {
         // Simple AI: follow waypoints
         if (targetIndex >= c.samplePoints.size()) targetIndex = 0;
-        PVector target = c.samplePoints.get(targetIndex);
-        PVector dir = PVector.sub(target, pos);
-        float distSquared = dir.x * dir.x + dir.z * dir.z;
+        int size = c.samplePoints.size();
+        int nearestIndex = targetIndex;
+        float bestDistSq = Float.MAX_VALUE;
+        int searchRadius = min(200, size - 1);
 
-        if (distSquared < 3600) { // 60 squared
-            targetIndex = (targetIndex + 1) % c.samplePoints.size();
-            target = c.samplePoints.get(targetIndex);
-            dir = PVector.sub(target, pos);
+        for (int offset = -searchRadius; offset <= searchRadius; offset++) {
+            int idx = (targetIndex + offset + size) % size;
+            PVector sample = c.samplePoints.get(idx);
+            float dx = sample.x - pos.x;
+            float dz = sample.z - pos.z;
+            float d2 = dx * dx + dz * dz;
+                if (d2 < bestDistSq) {
+                    bestDistSq = d2;
+                    nearestIndex = idx;
+                }
         }
 
-        dir.normalize();
-        float targetYaw = atan2(dir.z, dir.x);
-        float delta = targetYaw - yaw;
+        if (bestDistSq > 2500) { // fallback to full search if car drifts far
+            bestDistSq = Float.MAX_VALUE;
+                for (int i = 0; i < size; i++) {
+                PVector sample = c.samplePoints.get(i);
+                float dx = sample.x - pos.x;
+                float dz = sample.z - pos.z;
+                float d2 = dx * dx + dz * dz;
+                    if (d2 < bestDistSq) {
+                        bestDistSq = d2;
+                        nearestIndex = i;
+                    }
+            }
+        }
+
+        targetIndex = nearestIndex;
+        int lookaheadSteps = min(30, size - 1);
+        int lookaheadIndex = (targetIndex + lookaheadSteps) % size;
+        PVector currentSample = c.samplePoints.get(targetIndex);
+        PVector futureSample = c.samplePoints.get(lookaheadIndex);
+        PVector trackDir = PVector.sub(futureSample, currentSample);
+        trackDir.y = 0;
+        trackDir.normalize();
+
+        float desiredAngle = atan2(trackDir.z, trackDir.x);
+        float delta = desiredAngle - yaw;
         while (delta > PI) delta -= TWO_PI;
         while (delta < -PI) delta += TWO_PI;
-        yaw += delta * 0.9; // smooth progressive rotation
-        
+        yaw += delta * 0.1; // smooth progressive rotation toward the track direction
+
         // movement - simple like Car class
         pos.x += speed * cos(yaw);
         pos.z += speed * sin(yaw);
         oldY = pos.y;
         // Get road Y position
         float roadY = c.getRoadY(pos.x, pos.y, pos.z);
-        
+
         // gravity and collision
-        if(c.isCollision(pos.x, pos.y, pos.z)) {
+        if (c.isCollision(pos.x, pos.y, pos.z)) {
             pos.y = roadY;
             vy = 0;
-        } else { 
-            vy += g; 
-            pos.y += vy; 
+        } else {
+            vy += g;
+            pos.y += vy;
         }
 
-        if(pos.y > 200) { 
-            pos.set(startPos); 
+        if (pos.y > 200) {
+            pos.set(startPos);
             vy = 0;
             oldY = 0;
             yaw = 0;
             targetIndex = 0;
-        } 
+        }
 
         // car collision
         PVector diff = PVector.sub(pos, player.pos);
         float collDistSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
-        int maxDist = 35; 
+        int maxDist = 35;
         if (collDistSquared < maxDist * maxDist) {
             diff.normalize();
             pos.add(PVector.mult(diff, maxDist - sqrt(collDistSquared)));
