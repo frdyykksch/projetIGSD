@@ -3,7 +3,7 @@ import processing.sound.*;
 Environment environment;
 Circuit circuitF1;
 ArrayList<Car> cars;
-ArrayList<CarP> carsPolice;
+ArrayList<Police> carsPolice;
 Car car1;
 MiniMap minimap;
 
@@ -24,14 +24,14 @@ void setup() {
 
   startPos = circuitF1.getSpawnPoint();
   cars = new ArrayList<Car>();
-  carsPolice = new ArrayList<CarP>();
+  carsPolice = new ArrayList<Police>();
   car1 = new Car(this, startPos.x, startPos.y, startPos.z, "..\\resources\\Car2.obj");
   cars.add(car1);
-  car1.angle = circuitF1.getSpawnAngle();
+  car1.yaw = circuitF1.getSpawnYaw();
 
-  CarP car2 = new CarP(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
+  Police car2 = new Police(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
   carsPolice.add(car2);
-  car2.angle = circuitF1.getSpawnAngle();
+  car2.yaw = circuitF1.getSpawnYaw();
 
   minimap = new MiniMap(circuitF1);
   minimap.drawCircuitMapSetup(250, -100, -100);
@@ -53,10 +53,10 @@ void draw() {
     c.display();
   }
 
-  for (CarP cp : carsPolice) {
-    cp.backLightsP();
-    cp.updateP(circuitF1, car1);
-    cp.displayP();
+  for (Police cp : carsPolice) {
+    cp.backLights();
+    cp.update(circuitF1, car1);
+    cp.display();
   }
 
   environment.drawSkybox(32000);
@@ -78,14 +78,14 @@ void setupCamera(Car targetCar) {
   cameraHeight = lerp(cameraHeight, targetHeight, 0.06);
   cameraDistance = lerp(cameraDistance, targetDistance, 0.06);
 
-  float camX = targetCar.pos.x - cos(targetCar.angle) * cameraDistance;
+  float camX = targetCar.pos.x - cos(targetCar.yaw) * cameraDistance;
   float camY = targetCar.pos.y - cameraHeight;
-  float camZ = targetCar.pos.z - sin(targetCar.angle) * cameraDistance;
+  float camZ = targetCar.pos.z - sin(targetCar.yaw) * cameraDistance;
 
   float lookAheadDist = 50;
-  float lookX = targetCar.pos.x + cos(targetCar.angle) * lookAheadDist;
+  float lookX = targetCar.pos.x + cos(targetCar.yaw) * lookAheadDist;
   float lookY = targetCar.pos.y + cameraPitch * 200;
-  float lookZ = targetCar.pos.z + sin(targetCar.angle) * lookAheadDist;
+  float lookZ = targetCar.pos.z + sin(targetCar.yaw) * lookAheadDist;
 
   camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
   perspective(PI / 2.5, float(width) / float(height), 1, 10000);
