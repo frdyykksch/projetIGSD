@@ -5,7 +5,7 @@ Circuit circuitF1;
 ArrayList<Car> cars;
 ArrayList<CarP> carsPolice;
 Car car1;
-CarP car2;
+MiniMap minimap;
 
 boolean isNight = true;
 PVector startPos;
@@ -14,8 +14,6 @@ float cameraHeight = 60;
 float cameraDistance = 100;
 float cameraPitch = 0;
 float targetPitch = 0;
-
-PGraphics minimapBuffer;
 
 void setup() {
   size(800, 800, P3D);
@@ -31,11 +29,12 @@ void setup() {
   cars.add(car1);
   car1.angle = circuitF1.getSpawnAngle();
 
-  car2 = new CarP(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
+  CarP car2 = new CarP(this, startPos.x, startPos.y, startPos.z, "..\\resources\\PoliceCar.obj");
   carsPolice.add(car2);
   car2.angle = circuitF1.getSpawnAngle();
 
-  minimapBuffer = createGraphics(150, 150);
+  minimap = new MiniMap(circuitF1);
+  minimap.drawCircuitMapSetup(250, -100, -100);
 }
 
 void draw() {
@@ -48,7 +47,7 @@ void draw() {
 
   for (Car c : cars) {
     c.backLights();
-    c.update(circuitF1, car2);
+    c.update(circuitF1, carsPolice.size() > 0 ? carsPolice.get(0) : null);
     c.display();
   }
 
@@ -63,64 +62,9 @@ void draw() {
   popMatrix();
 
   // Draw minimap (top-left corner)
-  drawMinimap(circuitF1, 250, -100, -100);
+  minimap.drawMinimap(-100, -100, isNight, car1, carsPolice);
 }
 
-void drawMinimap(Circuit c, float size, float x, float y) {
-  ArrayList<PVector> points = c.samplePoints;
-
-  // map/circuit boundaries
-  float minX = points.get(0).x; float maxX = points.get(0).x;
-  float minZ = points.get(0).z; float maxZ = points.get(0).z;
-  for(PVector p : points) {
-    minX = min(minX, p.x); maxX = max(maxX, p.x);
-    minZ = min(minZ, p.z); maxZ = max(maxZ, p.z);
-  }
-
-  float scale = size / max(maxX - minX, maxZ - minZ);
-
-  hint(DISABLE_DEPTH_TEST);
-
-        // fond
-        fill(0, 0, 0, 100);
-        noStroke();
-        rect(x, y, size, size-80);
-        
-        
-        // cirucit
-        stroke(255);
-        strokeWeight(2);
-        noFill();
-        beginShape();
-        for (PVector p : points)
-          vertex(x + (p.x - minX) * scale, y + (p.z - minZ) * scale);
-        endShape(CLOSE);
-        
-        // car
-        fill(255, 0, 0);
-        strokeWeight(2);
-        pushMatrix();
-        translate(x + (car1.pos.x - minX) * scale, y + (car1.pos.z - minZ) * scale);
-        rotate(car1.angle);
-        triangle(-10, -6, -10, 6, 10, 0);
-        popMatrix();
-
-        // la police 
-        if (isNight){
-        fill(255, 255, 255);
-        }else{
-        fill(0, 0, 255);
-        }
-        strokeWeight(2);
-        pushMatrix();
-        translate(x + (car2.pos.x - minX) * scale, y + (car2.pos.z - minZ) * scale);
-        rotate(car2.angle);
-        triangle(-10, -6, -10, 6, 10, 0);
-        popMatrix();
-
-
-  hint(ENABLE_DEPTH_TEST);
-}
 
 void setupCamera(Car targetCar) {
   targetPitch = targetCar.isUp ? -0.2 : 0.0;

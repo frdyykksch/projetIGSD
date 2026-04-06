@@ -34,16 +34,18 @@ class CarP {
         float dist = dir.mag();
         float r1 = random(-2, 6); //tester
 
-        if (dist < 100 + r1) {
+        if (dist < 20 + r1) {
             targetIndex = (targetIndex + 1) % c.samplePoints.size();
             //pour faire la boucle on fait modulo
         } else {
             dir.normalize();
+            // Follow circuit in 3D (x, y, z)
             angle = atan2(dir.z, dir.x);
             pos.x += (speed) * cos(angle);
+            pos.y += (speed) * dir.y;
             pos.z += (speed) * sin(angle);
         }
-        // gravity
+        // gravity and collision
         boolean collision = c.isCollision(pos.x, pos.y, pos.z);
         if(collision) { pos.y = oldY; vy = 0; }
         else { vy += g; pos.y += vy; }
