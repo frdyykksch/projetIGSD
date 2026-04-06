@@ -102,8 +102,6 @@ class Circuit {
         sample.add(catmullRomPoint(p0, p1, p2, p3, t));
       }
     }
-    // sample.add(sample.get(0).copy()); // removed because snap last to first wanst good
-    // println(sample);
     return sample;
   }
 
@@ -133,27 +131,26 @@ class Circuit {
   }
 
   boolean isCollision(float x, float carY, float z) {
-  if (samplePoints == null) return false;
+  if(samplePoints == null) return false;
   float yTolerance = 150;
-  for (PVector p : samplePoints) {
-    if (abs(p.y - carY) > yTolerance) continue;
+  for(PVector p : samplePoints) {
+    if(abs(p.y - carY) > yTolerance) continue;
     float dxz = dist(x, 0, z, p.x, 0, p.z);
-    if (dxz < largeurRoute) return true;
+    if(dxz < largeurRoute) return true;
   }
   return false;
 }
 
   float getRoadY(float x, float carY, float z) {
     float closestDist = Float.MAX_VALUE;
-    float closestY = carY; // fallback: don't move if no road found
-    float yTolerance = 150; // less than the ~225 gap between overlapping roads
-  
-    for (PVector p : samplePoints) {
-      // skip points on the other level
-      if (abs(p.y - carY) > yTolerance) continue;
-      
+    float closestY = carY;
+    float yTolerance = 150;
+
+    for(PVector p : samplePoints) {
+      if(abs(p.y - carY) > yTolerance) continue;
+
       float d = dist(x, 0, z, p.x, 0, p.z);
-      if (d < closestDist) {
+      if(d < closestDist) {
         closestDist = d;
         closestY = p.y;
       }

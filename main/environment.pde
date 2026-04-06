@@ -10,7 +10,7 @@ class Environment {
   }
 
   void updateLighting(boolean night) {
-    if (night) {
+    if(night) {
       lightMoon();
     } else {
       lightSun();
@@ -28,7 +28,7 @@ class Environment {
   
   void setNightMode(boolean night) {
     PImage textureImage;
-    if (night) {
+    if(night) {
       textureImage = cubeNight;
     } else {
       textureImage = cube;

@@ -1,15 +1,15 @@
 class Vehicle {
     PVector pos;
-    float oldY; // for collison
+    float oldY;
     float speed;
     float boostSpeed = 13.0;
-    float boostCooldown = 20.0; // boost only works when >0.5, gains 0.01 every tick, reduces by 0.1 every tick when using
+    float boostCooldown = 20.0;
 
-    float yaw = 0; // yaw
+    float yaw = 0;
     float roll = 0;
     float pitch = 0;
 
-    float vy; // gravity, collsision
+    float vy;
     float g = 0.125;
 
     PShape model;
@@ -44,23 +44,22 @@ class Vehicle {
     }
 
     void backLights() {
-        if (!lightOn) return;
-        if (!isNight) return;
+        if(!lightOn) return;
+        if(!isNight) return;
 
-        float lightDistance = 25; // Distance behind the car
+        float lightDistance = 25;
         float backLightX = pos.x - lightDistance * cos(yaw);
         float backLightZ = pos.z - lightDistance * sin(yaw);
-        float backLightY = pos.y; // Slightly above car for better illumination
+        float backLightY = pos.y;
         pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
         pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
     }
 
     void frontLights() {
-        // failed
     }
 
     void toggleLights() {
-    lightOn = !lightOn;
+        lightOn = !lightOn;
     }
 
     void carHorn() {

@@ -20,7 +20,7 @@ class Minimap {
         minZ = points.get(0).z;
         maxZ = points.get(0).z;
         
-        for (PVector p : points) {
+        for(PVector p : points) {
             minX = min(minX, p.x);
             maxX = max(maxX, p.x);
             minZ = min(minZ, p.z);
@@ -44,7 +44,7 @@ class Minimap {
         minimapBuffer.strokeWeight(2);
         minimapBuffer.noFill();
         minimapBuffer.beginShape();
-        for (PVector p : points) {
+        for(PVector p : points) {
             float px = (p.x - minX) * scale;
             float pz = (p.z - minZ) * scale;
             minimapBuffer.vertex(px, pz);
@@ -71,8 +71,8 @@ class Minimap {
         popMatrix();
         
         // Draw all police cars in the arrayList
-        for (Police cp : carsPolice) {
-            if (isNight) {
+        for(Police cp : carsPolice) {
+            if(isNight) {
                 fill(255, 255, 255);
             } else {
                 fill(0, 0, 255);

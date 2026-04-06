@@ -13,13 +13,13 @@ class Car {
 
   void update() {
     // Accélération / Freinage
-    if (isUp) speed += 0.002;
-    else if (isDown) speed -= 0.002;
+    if(isUp) speed += 0.002;
+    else if(isDown) speed -= 0.002;
     speed *= 0.98; // Friction
 
     // Direction (Changement de file)
-    if (isLeft)  laneOffset = lerp(laneOffset, -1.0, 0.1);
-    else if (isRight) laneOffset = lerp(laneOffset, 1.0, 0.1);
+    if(isLeft)  laneOffset = lerp(laneOffset, -1.0, 0.1);
+    else if(isRight) laneOffset = lerp(laneOffset, 1.0, 0.1);
     else laneOffset = lerp(laneOffset, 0, 0.05);
     
     trackPos.y = laneOffset;

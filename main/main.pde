@@ -66,17 +66,16 @@ void draw() {
 
   popMatrix();
 
-  // Draw minimap (top-left corner)
   minimap.drawMinimap(-100, -100, isNight, car1, carsPolice);
 }
 
 void keyPressed() {
-  if (key == 'n' || key == 'N') {
+  if(key == 'n' || key == 'N') {
     isNight = !isNight;
     environment.setNightMode(isNight);
-  } else if (key == 'q' || key == 'Q') {
+  } else if(key == 'q' || key == 'Q') {
     firstPerson = !firstPerson;
-  } else if (key == 'e' || key == 'E') {
+  } else if(key == 'e' || key == 'E') {
     car1.toggleLights();
   }
   setControl(keyCode, true);
@@ -88,12 +87,12 @@ void keyReleased() {
 
 
 void setControl(int code, boolean state) {
-  if (code == LEFT || code == 'a' || code == 'A')  car1.isLeft = state;
-  if (code == RIGHT || code == 'd' || code == 'D') car1.isRight = state;
-  if (code == UP || code == 'w' || code == 'W')   car1.isUp = state;
-  if (code == DOWN || code == 's' || code == 'S') car1.isDown = state;
-  if (code == 32) car1.isSpace = state;
-  if (code == 'f' || code == 'F') car1.isBoost = state;
+  if(code == LEFT || code == 'a' || code == 'A')  car1.isLeft = state;
+  if(code == RIGHT || code == 'd' || code == 'D') car1.isRight = state;
+  if(code == UP || code == 'w' || code == 'W')   car1.isUp = state;
+  if(code == DOWN || code == 's' || code == 'S') car1.isDown = state;
+  if(code == 32) car1.isSpace = state;
+  if(code == 'f' || code == 'F') car1.isBoost = state;
 }
 
 void mouseMoved() {

@@ -89,7 +89,7 @@ void drawSkybox(float size) {
 
 void cubeNightDay(boolean night) {
   PImage textureImage;
-  if (night) {
+  if(night) {
     textureImage = loadImage("..\\resources\\night.jpg");
   } else {
     textureImage = loadImage("..\\resources\\desert.png");

@@ -81,7 +81,7 @@ public class Circuit {
       PVector p2 = pointsCircuit.get((i + 1) % n);
       PVector p3 = pointsCircuit.get((i + 2) % n);
 
-      for (int s = 0; s < stepsPerSegment; s++) {
+      for(int s = 0; s < stepsPerSegment; s++) {
         float t = s / (float) stepsPerSegment;
         sample.add(catmullRomPoint(p0, p1, p2, p3, t));
       }

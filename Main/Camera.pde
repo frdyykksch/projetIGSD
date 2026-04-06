@@ -23,15 +23,22 @@ class Camera {
     float camY = targetCar.pos.y - cameraHeight;
     float camZ = targetCar.pos.z - sin(targetCar.yaw) * cameraDistance;
 
-    if (firstPerson) {
-      float lookAheadDist = 100;
-      camX = targetCar.pos.x- 1 * cos(targetCar.yaw);
-      camY = targetCar.pos.y - 11;
-      camZ = targetCar.pos.z;
+    if(firstPerson) {
+      float lookAheadDist = 150;
+
+      camX = targetCar.pos.x - 1.2 * cos(targetCar.yaw);
+      camY = targetCar.pos.y - 10;
+      camZ = targetCar.pos.z - 1.2 * sin(targetCar.yaw);
+
       float lookX = targetCar.pos.x + cos(targetCar.yaw) * lookAheadDist;
-      float lookY = camY + cameraPitch * 30;
+      float lookY = targetCar.pos.y + 30;
       float lookZ = targetCar.pos.z + sin(targetCar.yaw) * lookAheadDist;
-      camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
+
+      float upX = 0;
+      float upY = cos(targetCar.roll);
+      float upZ = sin(targetCar.roll);
+
+      camera(camX, camY, camZ, lookX, lookY, lookZ, upX, upY, upZ);
     } else {
       float lookAheadDist = 50;
       float lookX = targetCar.pos.x + cos(targetCar.yaw) * lookAheadDist;
@@ -44,9 +51,7 @@ class Camera {
 
   void look() {
     float centerY = height / 2.0;
-    cameraPitch = (pmouseY - centerY) * 0.001; // Scale to reasonable pitch values
-    // Clamp pitch to prevent camera flipping
+    cameraPitch = (pmouseY - centerY) * 0.001;
     cameraPitch = constrain(cameraPitch, -PI/4, PI/4);
   }
 }
-
