@@ -123,7 +123,7 @@ public class Circuit {
       } return false;
   }
 
-  float getSpawnAngle() {
+  float getSpawnYaw() {
     PVector p0 = pointsCircuit.get(0);
     PVector p1 = pointsCircuit.get(1);
     return atan2(p1.z - p0.z, p1.x - p0.x);

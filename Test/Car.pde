@@ -59,12 +59,12 @@ class Car {
     PVector pos3D = getWorldPos(trackPos.x);
     PVector target = getWorldPos(trackPos.x + 0.05);
     
-    float angle = atan2(target.z - pos3D.z, target.x - pos3D.x);
+    float yaw = atan2(target.z - pos3D.z, target.x - pos3D.x);
 
     pushMatrix();
     translate(pos3D.x, pos3D.y, pos3D.z);
     rotateX(PI);
-    rotateY(PI - angle); // La voiture regarde vers le point suivant
+    rotateY(PI - yaw); // La voiture regarde vers le point suivant
     scale(10);
     shape(model);
     popMatrix();
