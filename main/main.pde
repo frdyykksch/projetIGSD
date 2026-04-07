@@ -8,7 +8,8 @@ Car car1;
 Minimap minimap;
 Camera camera;
 GUI gui;
-Props props;
+Props recBox;
+Props startBanner;
 boolean isNight = false;
 PVector startPos;
 PVector endPos;
@@ -35,11 +36,13 @@ void setup() {
   
   camera = new Camera(car1);
   gui = new GUI(car1);
-  props = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/finish/BannerStartEnd.obj");
+  //banner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/finish/BannerStartEnd.obj");
+  startBanner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/startBanner/1startBanner.obj");
 
   minimap = new Minimap(circuitF1);
   minimap.drawCircuitMap(250, -100, -100);
   circuitF1.setupCircuit();
+  //circuitF1.drawGuardrails();
 }
 
 void draw() {
@@ -61,19 +64,19 @@ void draw() {
   }
   circuitF1.display();
   environment.drawSkybox(32000);
+  circuitF1.displayFences();
   
-  // Draw banner at start position
-  props.drawBanner();
-
+  startBanner.drawBanner();
+  
   for(Car c : cars) {
     c.update(circuitF1);
-    c.checkBannerCollision(startPos);
+    //c.checkBannerCollision(startPos);
     c.display();
   }
 
   for(Police cp : carsPolice) {
     cp.update(circuitF1, car1);
-    cp.checkBannerCollision(startPos);
+    //cp.checkBannerCollision(startPos);
     cp.display();
   }
 

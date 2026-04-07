@@ -1,5 +1,3 @@
-// https://www.youtube.com/watch?v=jvPPXbo87ds&t=2900s
-
 class Circuit {
   /*
    * ATTRIBUTES
@@ -10,7 +8,9 @@ class Circuit {
   float largeurRoute;
   int segmentsParCourbe = 1000;
   PImage roadTile;
+  PImage fenceTexture;
   PShape circuitShape;
+  PShape fenceShape;
 
   /*
    * CONSTRUCTORS
@@ -40,8 +40,10 @@ class Circuit {
 
     this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
-    roadTile = loadImage("..\\resources\\roadTile.jpg");
+    roadTile = loadImage("../resources/roadTile.jpg");
+    fenceTexture = loadImage("../resources/startBanner/Fence.png");
     setupCircuit();
+    setupFences(50, 80);
   }
 
   /*
@@ -179,6 +181,82 @@ class Circuit {
       float circuitCenterZ = 750;
       float lightHeight = -2000; // Very high above circuit
       pointLight(255, 255, 255, circuitCenterX, lightHeight, circuitCenterZ);
+    }
+  }
+
+  void setupFences(float fenceHeight, float fenceWidth) {
+    if(fenceTexture == null) return;
+    
+    fenceShape = createShape(GROUP);
+    noStroke();
+
+    PShape leftFence = createShape();
+    leftFence.beginShape(TRIANGLE_STRIP);
+    leftFence.textureMode(IMAGE);
+    leftFence.texture(fenceTexture);
+
+    PShape rightFence = createShape();
+    rightFence.beginShape(TRIANGLE_STRIP);
+    rightFence.textureMode(IMAGE);
+    rightFence.texture(fenceTexture);
+
+    float vTex = 0;
+    float vScale = fenceTexture.height; // plutot cool si on ne divise pas par 100
+    int m = samplePoints.size();
+
+    for(int i = 0; i < m; i++) {
+      PVector pt = samplePoints.get(i);
+      PVector nextPt = samplePoints.get((i + 1) % m);
+
+      PVector tangent = PVector.sub(nextPt, pt);
+      tangent.normalize();
+
+      PVector n = new PVector(-tangent.z, 0, tangent.x);
+      n.normalize();
+      n.mult(largeurRoute);
+
+      PVector leftTrack = PVector.sub(pt, n);
+      PVector rightTrack = PVector.add(pt, n);
+
+      // Left fence - bottom and top vertices
+      leftFence.vertex(leftTrack.x, leftTrack.y, leftTrack.z, 0, vTex);
+      leftFence.vertex(leftTrack.x, leftTrack.y - fenceHeight, leftTrack.z, 0, vTex + fenceHeight * vScale);
+
+      // Right fence - bottom and top vertices
+      rightFence.vertex(rightTrack.x, rightTrack.y, rightTrack.z, fenceTexture.width, vTex);
+      rightFence.vertex(rightTrack.x, rightTrack.y - fenceHeight, rightTrack.z, fenceTexture.width, vTex + fenceHeight * vScale);
+
+      vTex += PVector.dist(pt, nextPt) * vScale;
+    }
+
+    // Close the loop
+    PVector pStart = samplePoints.get(0);
+    PVector pNext = samplePoints.get(1);
+    PVector tangentStart = PVector.sub(pNext, pStart);
+    tangentStart.normalize();
+    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x);
+    nStart.normalize().mult(largeurRoute);
+
+    PVector leftStart = PVector.sub(pStart, nStart);
+    PVector rightStart = PVector.add(pStart, nStart);
+
+    leftFence.vertex(leftStart.x, leftStart.y, leftStart.z, 0, vTex);
+    leftFence.vertex(leftStart.x, leftStart.y - fenceHeight, leftStart.z, 0, vTex + fenceHeight * vScale);
+
+    rightFence.vertex(rightStart.x, rightStart.y, rightStart.z, fenceTexture.width, vTex);
+    rightFence.vertex(rightStart.x, rightStart.y - fenceHeight, rightStart.z, fenceTexture.width, vTex + fenceHeight * vScale);
+
+    leftFence.endShape();
+    rightFence.endShape();
+
+    fenceShape.addChild(leftFence);
+    fenceShape.addChild(rightFence);
+  }
+
+  void displayFences() {
+    if(fenceShape != null) {
+      textureWrap(REPEAT);
+      shape(fenceShape);
     }
   }
 }
