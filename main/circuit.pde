@@ -1,3 +1,5 @@
+// https://www.youtube.com/watch?v=jvPPXbo87ds&t=2900s
+
 class Circuit {
   /*
    * ATTRIBUTES
@@ -101,35 +103,23 @@ class Circuit {
   ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
     ArrayList<PVector> sample = new ArrayList<PVector>();
     int n = points.size();
-
-    for(int i = 0; i < n; i++) {
+    float tension = 0.4;
+  
+    for (int i = 0; i < n; i++) {
       PVector p0 = points.get((i - 1 + n) % n);
       PVector p1 = points.get(i);
       PVector p2 = points.get((i + 1) % n);
       PVector p3 = points.get((i + 2) % n);
-
-      for(int s = 0; s < stepsPerSegment; s++) {
+  
+      PVector cp1 = PVector.add(p1, PVector.mult(PVector.sub(p2, p0), tension));
+      PVector cp2 = PVector.sub(p2, PVector.mult(PVector.sub(p3, p1), tension));
+  
+      for (int s = 0; s < stepsPerSegment; s++) {
         float t = s / (float) stepsPerSegment;
-        sample.add(catmullRomPoint(p0, p1, p2, p3, t));
+        sample.add(cubicBezierPoint(p1, cp1, cp2, p2, t));
       }
     }
     return sample;
-  }
-
-  PVector catmullRomPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {
-    float t2 = t*t;
-    float t3 = t2*t;
-
-    float a0 = -0.5f*t3 + t2 - 0.5f*t;
-    float a1 =  1.5f*t3 - 2.5f*t2 + 1.0f;
-    float a2 = -1.5f*t3 + 2.0f*t2 + 0.5f*t;
-    float a3 =  0.5f*t3 - 0.5f*t2;
-
-    return new PVector(
-      a0*p0.x + a1*p1.x + a2*p2.x + a3*p3.x,
-      a0*p0.y + a1*p1.y + a2*p2.y + a3*p3.y,
-      a0*p0.z + a1*p1.z + a2*p2.z + a3*p3.z
-    );
   }
 
   PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {
