@@ -21,7 +21,7 @@ class Car extends Vehicle {
    * METHODS
    */
   void update(Circuit c) {
-    if(isBoost) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
+    if(isBoost && speed > 0) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);
 
     boolean canBoost = boostCooldown > 0.5;
@@ -41,6 +41,22 @@ class Car extends Vehicle {
     float nextRoadY = c.getRoadY(nextX, pos.y, nextZ);
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
+
+    float thresh = 0.1;
+    if(-pitch > thresh) {
+      if(isDown) {
+      } else if(isUp) {
+        if(isBoost && canBoost) {
+          speed = boostSpeed * 0.5;
+        } else {
+          speed = fwdSpeed * 0.7;
+        }
+      } else {
+        speed = min(speed, 1.0);
+      }
+    }
+
+
 
     if(isSpace && !soundPlayed) {
       file.play();

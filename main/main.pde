@@ -7,7 +7,7 @@ ArrayList<Police> carsPolice;
 Car car1;
 Minimap minimap;
 Camera camera;
-
+GUI gui;
 boolean isNight = false;
 PVector startPos;
 PVector endPos;
@@ -23,7 +23,6 @@ void setup() {
   cars = new ArrayList<Car>();
   carsPolice = new ArrayList<Police>();
 
-  
   startPos = circuitF1.getSpawnPoint();
   endPos = circuitF1.getLastPoint();
   float startYaw = circuitF1.getSpawnYaw();
@@ -34,6 +33,7 @@ void setup() {
   carsPolice.add(car2);
   
   camera = new Camera(car1);
+  gui = new GUI(car1);
 
   minimap = new Minimap(circuitF1);
   minimap.drawCircuitMap(250, -100, -100);
@@ -49,7 +49,6 @@ void draw() {
   environment.updateLighting(isNight);
   circuitF1.lightCircuit(isNight);
 
-  // Set up vehicle lights BEFORE drawing the circuit
   for(Car c : cars) {
     c.backLights();
     c.frontLights();
@@ -74,6 +73,7 @@ void draw() {
   popMatrix();
 
   minimap.drawCarsMap(-100, -100, isNight, car1, carsPolice);
+  gui.draw();
 }
 
 void keyPressed() {
