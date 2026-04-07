@@ -1,16 +1,25 @@
 class Car extends Vehicle {
+  /*
+   * ATTRIBUTES
+   */
   float fwdSpeed = 5.8;
   float bwdSpeed = -2.5;
   float stdYaw = 0.03;
 
   boolean isLeft, isRight, isUp, isDown, isSpace, isBoost;
 
+  /*
+   * CONSTRUCTORS
+   */
   Car(PApplet parent, float x, float y, float z, float yaw, String modelPath) {
     super(new PVector(x, y, z), yaw);
     super.model = loadShape(modelPath);
     super.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
   }
 
+  /*
+   * METHODS
+   */
   void update(Circuit c) {
     if(isBoost) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);

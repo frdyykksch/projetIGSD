@@ -36,7 +36,7 @@ void setup() {
   camera = new Camera(car1);
 
   minimap = new Minimap(circuitF1);
-  minimap.drawCircuitMapSetup(250, -100, -100);
+  minimap.drawCircuitMap(250, -100, -100);
   circuitF1.setupCircuit();
 }
 
@@ -66,7 +66,7 @@ void draw() {
 
   popMatrix();
 
-  minimap.drawMinimap(-100, -100, isNight, car1, carsPolice);
+  minimap.drawCarsMap(-100, -100, isNight, car1, carsPolice);
 }
 
 void keyPressed() {

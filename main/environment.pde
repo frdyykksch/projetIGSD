@@ -1,14 +1,23 @@
 class Environment {
+  /*
+   * ATTRIBUTES
+   */
   PImage cube;
   PImage cubeNight;
   PImage texFront, texBack, texLeft, texRight, texBottom, texTop;
 
+  /*
+   * CONSTRUCTORS
+   */
   Environment(boolean night) {
     cube = loadImage("..\\resources\\desert.png");
     cubeNight = loadImage("..\\resources\\night.jpg");
     setNightMode(night);
   }
 
+  /*
+   * METHODS
+   */
   void updateLighting(boolean night) {
     if(night) {
       lightMoon();

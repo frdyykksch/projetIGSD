@@ -1,4 +1,7 @@
 class Circuit {
+  /*
+   * ATTRIBUTES
+   */
   String nomCircuit;
   ArrayList<PVector> points;
   ArrayList<PVector> samplePoints;
@@ -7,9 +10,13 @@ class Circuit {
   PImage roadTile;
   PShape circuitShape;
 
+  /*
+   * CONSTRUCTORS
+   */
   Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile) {
     this.nomCircuit = nomCircuit; this.points = points; this.largeurRoute = largeurRoute; this.roadTile = loadImage(roadTileFile);
     this.samplePoints = sampleCircuit(segmentsParCourbe);
+    setupCircuit();
   }
 
   Circuit() {
@@ -32,8 +39,12 @@ class Circuit {
     this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
     roadTile = loadImage("..\\resources\\roadTile.jpg");
+    setupCircuit();
   }
 
+  /*
+   * METHODS
+   */
   void setupCircuit() {
     circuitShape = createShape(GROUP);
     noStroke();
