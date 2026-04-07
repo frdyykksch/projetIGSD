@@ -38,6 +38,7 @@ void setup() {
   
   Police car2 = new Police(this, endPos.x, endPos.y, endPos.z, startYaw, "..\\resources\\PoliceCar.obj");
   vehicles.add(car2);
+  car2.toggleBounce();
   
   // camera & gui
   camera = new Camera(car1);
@@ -72,6 +73,7 @@ void draw() {
     // v.checkBannerCollision(startPos);
     v.display();
   }
+
   
   startBanner.drawBanner();
   popMatrix();
@@ -116,6 +118,8 @@ void setControl(int code, boolean state) {
       car1.isBreak = state; break;
     case 'f': case 'F':
       car1.isHonk = state; break;
+    case 'r': case 'R':
+      car1.isReverseCam = state; break;
   }
 }
 

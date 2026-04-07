@@ -51,6 +51,13 @@ class Vehicle {
       pos.y += vy;
     }
 
+    float lookAhead = 10;
+    float nextX = pos.x + cos(yaw) * lookAhead;
+    float nextZ = pos.z + sin(yaw) * lookAhead;
+    float nextRoadY = c.getRoadY(nextX, pos.y, nextZ);
+    float targetPitch = atan2(nextRoadY - roadY, lookAhead);
+    pitch = lerp(pitch, targetPitch, 0.2);
+
     if (pos.y > 500) {
       pos.set(c.getSpawnPoint());
       vy = 0;

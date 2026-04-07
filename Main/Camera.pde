@@ -27,7 +27,23 @@ class Camera {
     float camY = targetCar.pos.y - cameraHeight;
     float camZ = targetCar.pos.z - sin(targetCar.yaw) * cameraDistance;
 
-    if(firstPerson) {
+    // reverse cam
+    if(targetCar.isReverseCam) {
+      float rcamDist = 50;
+      float rcamHeight = 20;
+
+      camX = targetCar.pos.x + cos(targetCar.yaw) * rcamDist;
+      camY = targetCar.pos.y - rcamHeight;
+      camZ = targetCar.pos.z + sin(targetCar.yaw) * rcamDist;
+
+      float lookX = targetCar.pos.x - cos(targetCar.yaw) * 50;
+      float lookY = targetCar.pos.y;
+      float lookZ = targetCar.pos.z - sin(targetCar.yaw) * 50;
+
+      camera(camX, camY, camZ, lookX, lookY, lookZ, 0, 1, 0);
+
+    // fpv
+    } else if(firstPerson) {
       float lookAheadDist = 150;
 
       camX = targetCar.pos.x - 1.2 * cos(targetCar.yaw);
@@ -43,6 +59,7 @@ class Camera {
       float upZ = sin(targetCar.roll);
 
       camera(camX, camY, camZ, lookX, lookY, lookZ, upX, upY, upZ);
+      
     } else {
       float lookAheadDist = 50;
       float lookX = targetCar.pos.x + cos(targetCar.yaw) * lookAheadDist;

@@ -6,7 +6,7 @@ class Car extends Vehicle {
   float bwdSpeed = -2.5;
   float stdYaw = 0.03;
 
-  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak;
+  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak, isReverseCam;
   boolean canBoost;
 
   /*
@@ -23,34 +23,41 @@ class Car extends Vehicle {
    */
   @Override
   void update(Circuit c) {
-    if(isBoost && speed > 0) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
+    if (isBoost && speed > 0) {
+      boostCooldown -= 0.1;
+    } else {
+      boostCooldown += 0.08;
+    }
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);
 
     canBoost = boostCooldown > 0.5;
-    if(isUp) { speed = (isBoost && canBoost) ? boostSpeed : fwdSpeed; }
-    else if(isDown) { speed = (isBoost && canBoost) ? bwdSpeed * 1.5 : bwdSpeed; }
-    else speed *= 0.96;
+    if (isUp) {
+      speed = (isBoost && canBoost) ? boostSpeed : fwdSpeed;
+    } else if (isDown) {
+      speed = (isBoost && canBoost) ? bwdSpeed * 1.5 : bwdSpeed;
+    } else {
+      speed *= 0.96;
+    }
 
-    if(isBreak) speed *= 0.7;
+    if (isBreak) speed *= 0.7;
 
-    if(isLeft) { yaw -= stdYaw;    roll = -0.15 * (speed / 6.0); }
-    else if(isRight) { yaw += stdYaw;    roll = 0.15 * (speed / 6.0); }
-    else { roll = lerp(roll, 0, 0.1); }
+    if (isLeft) {
+      yaw -= stdYaw;
+      roll = -0.15 * (speed / 6.0);
+    } else if (isRight) {
+      yaw += stdYaw;
+      roll = 0.15 * (speed / 6.0);
+    } else {
+      roll = lerp(roll, 0, 0.1);
+    }
 
-    float roadY = c.getRoadY(pos.x, pos.y, pos.z);
-
-    float lookAhead = 10;
-    float nextX = pos.x + cos(yaw) * lookAhead;
-    float nextZ = pos.z + sin(yaw) * lookAhead;
-    float nextRoadY = c.getRoadY(nextX, pos.y, nextZ);
-    float targetPitch = atan2(nextRoadY - roadY, lookAhead);
-    pitch = lerp(pitch, targetPitch, 0.2);
+    super.update(c);
 
     float thresh = 0.1;
-    if(-pitch > thresh) {
-      if(isDown) {
-      } else if(isUp) {
-        if(isBoost && canBoost) {
+    if (-pitch > thresh) {
+      if (isDown) {
+      } else if (isUp) {
+        if (isBoost && canBoost) {
           speed = boostSpeed * 0.6;
         } else {
           speed = fwdSpeed * 0.9;
@@ -60,15 +67,11 @@ class Car extends Vehicle {
       }
     }
 
-
-
-    if(isHonk && !soundPlayed) {
+    if (isHonk && !soundPlayed) {
       file.play();
       soundPlayed = true;
-    } else if(!isHonk) {
+    } else if (!isHonk) {
       soundPlayed = false;
     }
-
-    super.update(c);
   }
 }
