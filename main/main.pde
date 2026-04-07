@@ -15,9 +15,16 @@ GUI gui;
 
 Props startBanner;
 
+PImage controlTip;
+boolean gameStarted = false;
+int startTime;
+
 void setup() {
   size(800, 800, P3D);
   noStroke();
+
+  controlTip = loadImage("..\\resources\\controlTip.jpg");
+  startTime = millis();
 
   // env
   environment = new Environment(isNight);
@@ -53,6 +60,11 @@ void setup() {
 }
 
 void draw() {
+  if(!gameStarted && millis() - startTime < 4000) {
+    image(controlTip, 0, 0, width, height);
+    return;
+  } gameStarted = true;
+
   background(0);
 
   pushMatrix();
@@ -84,6 +96,7 @@ void draw() {
 
 // toggle
 void keyPressed() {
+  if(!gameStarted) gameStarted = true;
   switch(key) {
     case 'n': case 'N': 
       isNight = !isNight; environment.setNightMode(isNight); break;

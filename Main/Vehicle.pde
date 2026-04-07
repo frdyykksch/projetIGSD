@@ -43,7 +43,7 @@ class Vehicle {
     oldY = pos.y;
 
     float roadY = c.getRoadY(pos.x, pos.y, pos.z);
-    if (c.isCollision(pos.x, pos.y, pos.z)) {
+    if(c.isCollision(pos.x, pos.y, pos.z)) {
       pos.y = roadY;
       vy = 0;
     } else {
@@ -58,7 +58,7 @@ class Vehicle {
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
 
-    if (pos.y > 500) {
+    if(pos.y > 500) {
       pos.set(c.getSpawnPoint());
       vy = 0;
       oldY = 0;
@@ -77,7 +77,7 @@ class Vehicle {
     rotateX(roll);
     rotateZ(pitch);
 
-    if (isBounce) {
+    if(isBounce) {
       bounce();
     }
     scale(10);
@@ -91,27 +91,27 @@ class Vehicle {
     float backLightX = pos.x - lightDistance * cos(yaw);
     float backLightZ = pos.z - lightDistance * sin(yaw);
     float backLightY = pos.y;
-    if (!isNight) {
+    if(!isNight) {
       pointLight(255, 255, 255, backLightX+20, backLightY-20, backLightZ);
     }
-    if (lightOn && isNight) {
+    if(lightOn && isNight) {
       pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
       pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
     }
-    if (lightOn && !isNight) {
+    if(lightOn && !isNight) {
       pointLight(255, 0, 0, backLightX-10, backLightY-10, backLightZ);
     }
   }
 
   void frontLights() {
-    if (lightOn && isNight) {
+    if(lightOn && isNight) {
       float lightDistance = 25;
       float frontLightX = pos.x + lightDistance * cos(yaw);
       float frontLightZ = pos.z + lightDistance * sin(yaw);
       float frontLightY = pos.y;
       pointLight(255, 255, 0, frontLightX+13, frontLightY-10, frontLightZ);
     }
-    if (lightOn && !isNight) {
+    if(lightOn && !isNight) {
       float lightDistance = 25;
       float frontLightX = pos.x + lightDistance * cos(yaw);
       float frontLightZ = pos.z + lightDistance * sin(yaw);
@@ -125,7 +125,7 @@ class Vehicle {
   }
 
   void carHorn() {
-    if (!file.isPlaying()) {
+    if(!file.isPlaying()) {
       file.play();
     }
   }
@@ -134,7 +134,7 @@ class Vehicle {
     float collisionRadius = 40; // Collision radius for the banner
     float distance = dist(pos.x, pos.y, pos.z, bannerPos.x, bannerPos.y, bannerPos.z);
 
-    if (distance < collisionRadius) {
+    if(distance < collisionRadius) {
       // Push the vehicle back from the banner
       float pushBackDistance = collisionRadius - distance;
       PVector direction = PVector.sub(pos, bannerPos);
@@ -148,7 +148,7 @@ class Vehicle {
     PVector diff = PVector.sub(pos, other.pos);
     float collDistSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
     int maxDist = 35;
-    if (collDistSquared < maxDist * maxDist && collDistSquared > 0) {
+    if(collDistSquared < maxDist * maxDist && collDistSquared > 0) {
       diff.normalize();
       float pushStrength = maxDist - sqrt(collDistSquared);
       pos.add(PVector.mult(diff, pushStrength));
@@ -157,8 +157,8 @@ class Vehicle {
   }
 
   void checkAllVehicleCollisions(ArrayList<Vehicle> vehicles) {
-    for (Vehicle other : vehicles) {
-      if (other != this) {
+    for(Vehicle other : vehicles) {
+      if(other != this) {
         checkVehicleCollision(other);
       }
     }
@@ -166,16 +166,16 @@ class Vehicle {
 
   void bounce() {
     bounceTimer += 0.02;
-    if (bounceTimer >= 1.0) bounceTimer = 0;
+    if(bounceTimer >= 1.0) bounceTimer = 0;
     float t = bounceTimer;
 
-    if (t < 0.25) {
+    if(t < 0.25) {
       float s = t / 0.25;
       scale(1, 1 + s * 0.5, 1);
-    } else if (t < 0.5) {
+    } else if(t < 0.5) {
       float s = (t - 0.25) / 0.25;
       scale(1, 1.5 - s * 0.5, 1);
-    } else if (t < 0.75) {
+    } else if(t < 0.75) {
       float s = (t - 0.5) / 0.25;
       scale(1, 1, 1 + s * 0.3);
     } else {
