@@ -35,7 +35,7 @@ void setup() {
   
   camera = new Camera(car1);
   gui = new GUI(car1);
-  props = new Props(this, startPos.x, startPos.y, startPos.z,"..\\resources\\FlagStartEnd.obj");
+  props = new Props(this, startPos.x, startPos.y, startPos.z, "..\\resources\\FlagStartEnd.obj");
 
   minimap = new Minimap(circuitF1);
   minimap.drawCircuitMap(250, -100, -100);

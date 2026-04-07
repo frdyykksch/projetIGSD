@@ -7,6 +7,7 @@ class Car extends Vehicle {
   float stdYaw = 0.03;
 
   boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak;
+  boolean canBoost;
 
   /*
    * CONSTRUCTORS
@@ -24,7 +25,7 @@ class Car extends Vehicle {
     if(isBoost && speed > 0) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);
 
-    boolean canBoost = boostCooldown > 0.5;
+    canBoost = boostCooldown > 0.5;
     if(isUp) { speed = (isBoost && canBoost) ? boostSpeed : fwdSpeed; }
     else if(isDown) { speed = (isBoost && canBoost) ? bwdSpeed * 1.5 : bwdSpeed; }
     else speed *= 0.96;
