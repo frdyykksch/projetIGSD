@@ -8,6 +8,7 @@ Car car1;
 Minimap minimap;
 Camera camera;
 GUI gui;
+Props props;
 boolean isNight = false;
 PVector startPos;
 PVector endPos;
@@ -34,6 +35,7 @@ void setup() {
   
   camera = new Camera(car1);
   gui = new GUI(car1);
+  props = new Props(this, startPos.x, startPos.y, startPos.z,"..\\resources\\FlagStartEnd.obj");
 
   minimap = new Minimap(circuitF1);
   minimap.drawCircuitMap(250, -100, -100);
@@ -59,14 +61,19 @@ void draw() {
   }
   circuitF1.display();
   environment.drawSkybox(32000);
+  
+  // Draw banner at start position
+  props.drawBanner();
 
   for(Car c : cars) {
     c.update(circuitF1);
+    c.checkBannerCollision(startPos);
     c.display();
   }
 
   for(Police cp : carsPolice) {
     cp.update(circuitF1, car1);
+    cp.checkBannerCollision(startPos);
     cp.display();
   }
 

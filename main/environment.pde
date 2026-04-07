@@ -10,8 +10,8 @@ class Environment {
    * CONSTRUCTORS
    */
   Environment(boolean night) {
-    cube = loadImage("..\\resources\\desert.png");
-    cubeNight = loadImage("..\\resources\\night.jpg");
+    cube = loadImage("../resources/desert.png");
+    cubeNight = loadImage("../resources/night.jpg");
     setNightMode(night);
   }
 
