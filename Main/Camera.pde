@@ -16,8 +16,12 @@ class Camera {
     float targetHeight = targetCar.isUp ? 40 : 60;
     float targetDistance = targetCar.isUp ? 80 : 100;
 
+    if (targetCar.isBoost && targetCar.canBoost) {
+      targetDistance += 30;
+    }
+
     cameraHeight = lerp(cameraHeight, targetHeight, 0.06);
-    cameraDistance = lerp(cameraDistance, targetDistance, 0.06);
+    cameraDistance = lerp(cameraDistance, targetDistance, 0.04);
 
     float camX = targetCar.pos.x - cos(targetCar.yaw) * cameraDistance;
     float camY = targetCar.pos.y - cameraHeight;
