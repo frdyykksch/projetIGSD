@@ -1,99 +1,96 @@
 import processing.sound.*;
 
 Environment environment;
+boolean isNight = false;
+
 Circuit circuitF1;
-ArrayList<Car> cars;
-ArrayList<Police> carsPolice;
-Car car1;
 Minimap minimap;
+
+ArrayList<Vehicle> vehicles;
+Car car1;
+boolean firstPerson = false;
+
 Camera camera;
 GUI gui;
-Props recBox;
-Props startBanner;
-boolean isNight = false;
-PVector startPos;
-PVector endPos;
 
-boolean firstPerson = false;
+Props startBanner;
 
 void setup() {
   size(800, 800, P3D);
   noStroke();
 
+  // env
   environment = new Environment(isNight);
+  
+  // circuit
   circuitF1 = new Circuit();
-  cars = new ArrayList<Car>();
-  carsPolice = new ArrayList<Police>();
 
-  startPos = circuitF1.getSpawnPoint();
-  endPos = circuitF1.getLastPoint();
+  PVector startPos = circuitF1.getSpawnPoint();
+  PVector endPos = circuitF1.getLastPoint();
   float startYaw = circuitF1.getSpawnYaw();
+  circuitF1.setupCircuit();
+
+  // vehicles
+  vehicles = new ArrayList<Vehicle>();
+
   car1 = new Car(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\mainCar2\\insideCar.obj");
-  cars.add(car1);
+  vehicles.add(car1);
   
   Police car2 = new Police(this, endPos.x, endPos.y, endPos.z, startYaw, "..\\resources\\PoliceCar.obj");
-  carsPolice.add(car2);
+  vehicles.add(car2);
   
+  // camera & gui
   camera = new Camera(car1);
   gui = new GUI(car1);
-  //banner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/finish/BannerStartEnd.obj");
+
+  // banner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/finish/BannerStartEnd.obj");
   startBanner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/startBanner/1startBanner.obj");
 
+  // minimap
   minimap = new Minimap(circuitF1);
   minimap.drawCircuitMap(250, -100, -100);
-  circuitF1.setupCircuit();
-  //circuitF1.drawGuardrails();
 }
 
 void draw() {
   background(0);
+
   pushMatrix();
   translate(width / 2, height / 2, 0);
   camera.update();
+  
   environment.drawSkybox(8000);
   environment.updateLighting(isNight);
+  
   circuitF1.lightCircuit(isNight);
-
-  for(Car c : cars) {
-    c.backLights();
-    c.frontLights();
-  }
-  for(Police cp : carsPolice) {
-    cp.backLights();
-    cp.frontLights();
-  }
   circuitF1.display();
-  environment.drawSkybox(32000);
-  circuitF1.displayFences();
+
+  for(Vehicle v : vehicles) {
+    v.backLights();
+    v.frontLights();
+    v.update(circuitF1);
+    v.checkAllVehicleCollisions(vehicles);
+    // v.checkBannerCollision(startPos);
+    v.display();
+  }
   
   startBanner.drawBanner();
-  
-  for(Car c : cars) {
-    c.update(circuitF1);
-    //c.checkBannerCollision(startPos);
-    c.display();
-  }
-
-  for(Police cp : carsPolice) {
-    cp.update(circuitF1, car1);
-    //cp.checkBannerCollision(startPos);
-    cp.display();
-  }
-
   popMatrix();
 
-  minimap.drawCarsMap(-100, -100, isNight, car1, carsPolice);
-  gui.draw();
+  minimap.drawCarsMap(-100, -100, isNight, car1, vehicles);
+  gui.drawGUI();
 }
 
+// toggle
 void keyPressed() {
-  if(key == 'n' || key == 'N') {
-    isNight = !isNight;
-    environment.setNightMode(isNight);
-  } else if(key == 'q' || key == 'Q') {
-    firstPerson = !firstPerson;
-  } else if(key == 'e' || key == 'E') {
-    car1.toggleLights();
+  switch(key) {
+    case 'n': case 'N': 
+      isNight = !isNight; environment.setNightMode(isNight); break;
+    case 'q': case 'Q':
+      firstPerson = !firstPerson; break;
+    case 'e': case 'E':
+      car1.toggleLights(); break;
+    case 'b': case 'B':
+      car1.toggleBounce(); break;
   }
   setControl(keyCode, true);
 }
@@ -102,15 +99,24 @@ void keyReleased() {
   setControl(keyCode, false);
 }
 
-
+// hold
 void setControl(int code, boolean state) {
-  if(code == LEFT || code == 'a' || code == 'A')  car1.isLeft = state;
-  if(code == RIGHT || code == 'd' || code == 'D') car1.isRight = state;
-  if(code == UP || code == 'w' || code == 'W')   car1.isUp = state;
-  if(code == DOWN || code == 's' || code == 'S') car1.isDown = state;
-  if(code == CONTROL) car1.isBoost = state;
-  if(code == 32) car1.isBreak = state;
-  if(code == 'f' || code == 'F') car1.isHonk = state;
+  switch(code) {
+    case LEFT: case 'a': case 'A':
+      car1.isLeft = state; break;
+    case RIGHT: case 'd': case 'D':
+      car1.isRight = state; break;
+    case UP: case 'w': case 'W':
+      car1.isUp = state; break;
+    case DOWN: case 's': case 'S':
+      car1.isDown = state; break;
+    case CONTROL:
+      car1.isBoost = state; break;
+    case 32: // space
+      car1.isBreak = state; break;
+    case 'f': case 'F':
+      car1.isHonk = state; break;
+  }
 }
 
 void mouseMoved() {

@@ -16,7 +16,7 @@ class Camera {
     float targetHeight = targetCar.isUp ? 40 : 60;
     float targetDistance = targetCar.isUp ? 80 : 100;
 
-    if (targetCar.isBoost && targetCar.canBoost) {
+    if(targetCar.isBoost && targetCar.canBoost) {
       targetDistance += 30;
     }
 

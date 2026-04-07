@@ -50,56 +50,51 @@ class Circuit {
    * METHODS
    */
   void setupCircuit() {
-    circuitShape = createShape(GROUP);
-    noStroke();
+    circuitShape = buildStrip(roadTile, 0, roadTile.width, 0, roadTile.height / 80.0);
+    setupFences(50, 80);
+  }
 
+  PShape buildStrip(PImage tex, float u1, float u2, float yOff, float yScale) {
     PShape strip = createShape();
     strip.beginShape(TRIANGLE_STRIP);
     strip.textureMode(IMAGE);
-    strip.texture(roadTile);
-    strip.specular(150, 150, 150);
-    strip.shininess(5);
+    strip.texture(tex);
+    strip.noStroke();
 
     float vTex = 0;
-    float vScale = roadTile.height / 80.0;
     int m = samplePoints.size();
 
     for(int i = 0; i < m; i++) {
       PVector pt = samplePoints.get(i);
       PVector nextPt = samplePoints.get((i + 1) % m);
 
-      PVector tangent = PVector.sub(nextPt, pt);
-      tangent.normalize();
-
-      PVector n = new PVector(-tangent.z, 0, tangent.x);
-      n.normalize();
-      n.mult(largeurRoute);
+      PVector tangent = PVector.sub(nextPt, pt).normalize();
+      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
 
       PVector left = PVector.sub(pt, n);
       PVector right = PVector.add(pt, n);
 
-      strip.vertex(left.x, left.y, left.z, 0, vTex);
-      strip.vertex(right.x, right.y, right.z, roadTile.width, vTex);
+      strip.vertex(left.x, left.y + yOff, left.z, u1, vTex);
+      strip.vertex(right.x, right.y + yOff, right.z, u2, vTex);
 
-      vTex += PVector.dist(pt, nextPt) * vScale;
+      vTex += PVector.dist(pt, nextPt) * yScale;
     }
     PVector pStart = samplePoints.get(0);
     PVector pNext = samplePoints.get(1);
-    PVector tangentStart = PVector.sub(pNext, pStart);
-    tangentStart.normalize();
-    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x);
-    nStart.normalize().mult(largeurRoute);
+    PVector tangentStart = PVector.sub(pNext, pStart).normalize();
+    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
 
-    strip.vertex(pStart.x - nStart.x, pStart.y, pStart.z - nStart.z, 0, vTex);
-    strip.vertex(pStart.x + nStart.x, pStart.y, pStart.z + nStart.z, roadTile.width, vTex);
+    strip.vertex(pStart.x - nStart.x, pStart.y + yOff, pStart.z - nStart.z, u1, vTex);
+    strip.vertex(pStart.x + nStart.x, pStart.y + yOff, pStart.z + nStart.z, u2, vTex);
 
     strip.endShape();
-    circuitShape.addChild(strip);
+    return strip;
   }
 
   void display() {
     textureWrap(REPEAT);
     shape(circuitShape);
+    shape(fenceShape);
   }
 
   ArrayList<PVector> sampleCircuit(int stepsPerSegment) {
@@ -107,7 +102,7 @@ class Circuit {
     int n = points.size();
     float tension = 0.4;
   
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       PVector p0 = points.get((i - 1 + n) % n);
       PVector p1 = points.get(i);
       PVector p2 = points.get((i + 1) % n);
@@ -116,7 +111,7 @@ class Circuit {
       PVector cp1 = PVector.add(p1, PVector.mult(PVector.sub(p2, p0), tension));
       PVector cp2 = PVector.sub(p2, PVector.mult(PVector.sub(p3, p1), tension));
   
-      for (int s = 0; s < stepsPerSegment; s++) {
+      for(int s = 0; s < stepsPerSegment; s++) {
         float t = s / (float) stepsPerSegment;
         sample.add(cubicBezierPoint(p1, cp1, cp2, p2, t));
       }
@@ -176,7 +171,7 @@ class Circuit {
   }
 
   void lightCircuit(boolean isNight) {
-    if (!isNight) {
+    if(!isNight) {
       float circuitCenterX = 1000;
       float circuitCenterZ = 750;
       float lightHeight = -2000; // Very high above circuit
@@ -186,77 +181,53 @@ class Circuit {
 
   void setupFences(float fenceHeight, float fenceWidth) {
     if(fenceTexture == null) return;
-    
+
     fenceShape = createShape(GROUP);
     noStroke();
 
-    PShape leftFence = createShape();
-    leftFence.beginShape(TRIANGLE_STRIP);
-    leftFence.textureMode(IMAGE);
-    leftFence.texture(fenceTexture);
+    float vScale = fenceTexture.height;
 
-    PShape rightFence = createShape();
-    rightFence.beginShape(TRIANGLE_STRIP);
-    rightFence.textureMode(IMAGE);
-    rightFence.texture(fenceTexture);
+    PShape leftFence = buildFenceStrip(fenceTexture, 0, fenceWidth, vScale, 0, 0, fenceHeight);
+    PShape rightFence = buildFenceStrip(fenceTexture, fenceTexture.width, fenceWidth, vScale, 0, 0, fenceHeight);
+
+    fenceShape.addChild(leftFence);
+    fenceShape.addChild(rightFence);
+  }
+
+  PShape buildFenceStrip(PImage tex, float u1, float u2, float yScale, float yOff1, float yOff2, float height) {
+    PShape strip = createShape();
+    strip.beginShape(TRIANGLE_STRIP);
+    strip.textureMode(IMAGE);
+    strip.texture(tex);
+    strip.noStroke();
 
     float vTex = 0;
-    float vScale = fenceTexture.height; // plutot cool si on ne divise pas par 100
     int m = samplePoints.size();
 
     for(int i = 0; i < m; i++) {
       PVector pt = samplePoints.get(i);
       PVector nextPt = samplePoints.get((i + 1) % m);
 
-      PVector tangent = PVector.sub(nextPt, pt);
-      tangent.normalize();
+      PVector tangent = PVector.sub(nextPt, pt).normalize();
+      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
 
-      PVector n = new PVector(-tangent.z, 0, tangent.x);
-      n.normalize();
-      n.mult(largeurRoute);
+      PVector left = PVector.sub(pt, n);
+      PVector right = PVector.add(pt, n);
 
-      PVector leftTrack = PVector.sub(pt, n);
-      PVector rightTrack = PVector.add(pt, n);
+      strip.vertex(left.x, left.y + yOff1, left.z, u1, vTex);
+      strip.vertex(left.x, left.y + yOff1 - height, left.z, u1, vTex + height * yScale);
 
-      // Left fence - bottom and top vertices
-      leftFence.vertex(leftTrack.x, leftTrack.y, leftTrack.z, 0, vTex);
-      leftFence.vertex(leftTrack.x, leftTrack.y - fenceHeight, leftTrack.z, 0, vTex + fenceHeight * vScale);
-
-      // Right fence - bottom and top vertices
-      rightFence.vertex(rightTrack.x, rightTrack.y, rightTrack.z, fenceTexture.width, vTex);
-      rightFence.vertex(rightTrack.x, rightTrack.y - fenceHeight, rightTrack.z, fenceTexture.width, vTex + fenceHeight * vScale);
-
-      vTex += PVector.dist(pt, nextPt) * vScale;
+      vTex += PVector.dist(pt, nextPt) * yScale;
     }
-
-    // Close the loop
     PVector pStart = samplePoints.get(0);
     PVector pNext = samplePoints.get(1);
-    PVector tangentStart = PVector.sub(pNext, pStart);
-    tangentStart.normalize();
-    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x);
-    nStart.normalize().mult(largeurRoute);
+    PVector tangentStart = PVector.sub(pNext, pStart).normalize();
+    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
 
-    PVector leftStart = PVector.sub(pStart, nStart);
-    PVector rightStart = PVector.add(pStart, nStart);
+    strip.vertex(pStart.x - nStart.x, pStart.y + yOff1, pStart.z - nStart.z, u1, vTex);
+    strip.vertex(pStart.x - nStart.x, pStart.y + yOff1 - height, pStart.z - nStart.z, u1, vTex + height * yScale);
 
-    leftFence.vertex(leftStart.x, leftStart.y, leftStart.z, 0, vTex);
-    leftFence.vertex(leftStart.x, leftStart.y - fenceHeight, leftStart.z, 0, vTex + fenceHeight * vScale);
-
-    rightFence.vertex(rightStart.x, rightStart.y, rightStart.z, fenceTexture.width, vTex);
-    rightFence.vertex(rightStart.x, rightStart.y - fenceHeight, rightStart.z, fenceTexture.width, vTex + fenceHeight * vScale);
-
-    leftFence.endShape();
-    rightFence.endShape();
-
-    fenceShape.addChild(leftFence);
-    fenceShape.addChild(rightFence);
-  }
-
-  void displayFences() {
-    if(fenceShape != null) {
-      textureWrap(REPEAT);
-      shape(fenceShape);
-    }
+    strip.endShape();
+    return strip;
   }
 }

@@ -21,6 +21,7 @@ class Car extends Vehicle {
   /*
    * METHODS
    */
+  @Override
   void update(Circuit c) {
     if(isBoost && speed > 0) { boostCooldown -= 0.1; } else { boostCooldown += 0.08; }
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);
@@ -68,15 +69,6 @@ class Car extends Vehicle {
       soundPlayed = false;
     }
 
-    pos.x += speed * cos(yaw);
-    pos.z += speed * sin(yaw);
-    oldY = pos.y;
-
-    if(c.isCollision(pos.x, pos.y, pos.z)) {
-      pos.y = roadY;
-      vy = 0;
-    } else { vy += g; pos.y += vy; }
-
-    if(pos.y > 500) { pos.set(startPos); vy = 0; oldY = 0; yaw = c.getSpawnYaw(); }
+    super.update(c);
   }
 }
