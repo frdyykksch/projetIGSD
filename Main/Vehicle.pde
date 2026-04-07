@@ -53,18 +53,45 @@ class Vehicle {
   }
 
   void backLights() {
-    if (!lightOn) return;
-    if (!isNight) return;
-
-    float lightDistance = 25;
-    float backLightX = pos.x - lightDistance * cos(yaw);
-    float backLightZ = pos.z - lightDistance * sin(yaw);
-    float backLightY = pos.y;
-    pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
-    pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
+    if (!isNight){
+        float lightDistance = 25;
+        float backLightX = pos.x - lightDistance * cos(yaw);
+        float backLightZ = pos.z - lightDistance * sin(yaw);
+        float backLightY = pos.y;
+        pointLight(255, 255, 255, backLightX+20, backLightY-20, backLightZ);
+    }
+    if(lightOn && isNight) {
+        float lightDistance = 25;
+        float backLightX = pos.x - lightDistance * cos(yaw);
+        float backLightZ = pos.z - lightDistance * sin(yaw);
+        float backLightY = pos.y;
+        pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
+        pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
+    }
+    if(lightOn && !isNight) {
+        float lightDistance = 25;
+        float backLightX = pos.x - lightDistance * cos(yaw);
+        float backLightZ = pos.z - lightDistance * sin(yaw);
+        float backLightY = pos.y;
+        pointLight(255, 0, 0, backLightX-10, backLightY-10, backLightZ);
+        }
   }
 
   void frontLights() {
+    if(lightOn && isNight) {
+        float lightDistance = 25;
+        float frontLightX = pos.x + lightDistance * cos(yaw);
+        float frontLightZ = pos.z + lightDistance * sin(yaw);
+        float frontLightY = pos.y;
+        pointLight(255, 255, 0, frontLightX+13, frontLightY-10, frontLightZ);
+    }
+    if(lightOn && !isNight) {
+        float lightDistance = 25;
+        float frontLightX = pos.x + lightDistance * cos(yaw);
+        float frontLightZ = pos.z + lightDistance * sin(yaw);
+        float frontLightY = pos.y;
+        pointLight(255, 255, 0, frontLightX+13, frontLightY-10, frontLightZ);
+        }
   }
 
   void toggleLights() {

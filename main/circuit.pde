@@ -182,4 +182,13 @@ class Circuit {
   PVector getLastPoint() {
     return this.points.get(this.points.size() - 1);
   }
+
+  void lightCircuit(boolean isNight) {
+    if (!isNight) {
+      float circuitCenterX = 1000;
+      float circuitCenterZ = 750;
+      float lightHeight = -2000; // Very high above circuit
+      pointLight(255, 255, 255, circuitCenterX, lightHeight, circuitCenterZ);
+    }
+  }
 }

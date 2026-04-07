@@ -36,7 +36,7 @@ void setup() {
   camera = new Camera(car1);
 
   minimap = new Minimap(circuitF1);
-  minimap.drawCircuitMap(250, -100, -100);
+  minimap.drawCircuitMapSetup(250, -100, -100);
   circuitF1.setupCircuit();
 }
 
@@ -47,33 +47,26 @@ void draw() {
   camera.update();
   environment.drawSkybox(8000);
   environment.updateLighting(isNight);
-  circuitF1.lightCircuit(isNight);
 
-  // Set up vehicle lights BEFORE drawing the circuit
-  for(Car c : cars) {
-    c.backLights();
-    c.frontLights();
-  }
-  for(Police cp : carsPolice) {
-    cp.backLights();
-    cp.frontLights();
-  }
   circuitF1.display();
   environment.drawSkybox(32000);
 
   for(Car c : cars) {
+    c.backLights();
+    // c.frontLights();
     c.update(circuitF1);
     c.display();
   }
 
   for(Police cp : carsPolice) {
+    cp.backLights();
     cp.update(circuitF1, car1);
     cp.display();
   }
 
   popMatrix();
 
-  minimap.drawCarsMap(-100, -100, isNight, car1, carsPolice);
+  minimap.drawMinimap(-100, -100, isNight, car1, carsPolice);
 }
 
 void keyPressed() {
