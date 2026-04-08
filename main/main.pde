@@ -82,6 +82,7 @@ void draw() {
     v.frontLights();
     v.update(circuitF1);
     v.checkAllVehicleCollisions(vehicles);
+    v.fenceCollision(circuitF1.getFenceBoundaries());
     // v.checkBannerCollision(startPos);
     v.display();
   }

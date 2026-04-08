@@ -58,6 +58,9 @@ class Vehicle {
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
 
+    // Check fence collision
+    fenceCollision(c.getFenceBoundaries());
+
     if(pos.y > 500) {
       pos.set(c.getSpawnPoint());
       vy = 0;
@@ -161,6 +164,51 @@ class Vehicle {
       if(other != this) {
         checkVehicleCollision(other);
       }
+    }
+  }
+
+  void fenceCollision(ArrayList<PVector>[] fenceBoundaries) {
+    if(fenceBoundaries == null || fenceBoundaries.length < 2) return;
+    
+    ArrayList<PVector> leftFence = fenceBoundaries[0];
+    ArrayList<PVector> rightFence = fenceBoundaries[1];
+    float maxDist = 8; // Collision radius from fence - reduced to avoid interfering with pathfinding
+    
+    // Find closest left fence point
+    PVector closestLeft = null;
+    float closestLeftDist = Float.MAX_VALUE;          
+    for(PVector p : leftFence) {
+      PVector diff = PVector.sub(pos, p);
+      float collDist = diff.mag();
+      if(collDist < closestLeftDist) {
+        closestLeftDist = collDist;
+        closestLeft = diff;
+      }
+    }
+    
+    // Find closest right fence point
+    PVector closestRight = null;
+    float closestRightDist = Float.MAX_VALUE;
+    for(PVector p : rightFence) {
+      PVector diff = PVector.sub(pos, p);
+      float collDist = diff.mag();
+      if(collDist < closestRightDist) {
+        closestRightDist = collDist;
+        closestRight = diff;
+      }
+    }
+    
+    // Only collide with closest point if within maxDist
+    if(closestLeftDist < maxDist && closestLeft != null) {
+      closestLeft.normalize();
+      pos.add(PVector.mult(closestLeft, maxDist - closestLeftDist));
+      speed *= 0.9;
+    }
+    
+    if(closestRightDist < maxDist && closestRight != null) {
+      closestRight.normalize();
+      pos.add(PVector.mult(closestRight, maxDist - closestRightDist));
+      speed *= 0.9;
     }
   }
 
