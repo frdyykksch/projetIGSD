@@ -9,8 +9,10 @@ class Car extends Vehicle {
 
   float jumpForce = -5.0;
 
-  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak, isReverseCam, isJump;
+  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak, isReverseCam, isJump, isMusic;
   boolean canBoost;
+  
+  SoundFile musicFile;
 
 
   /*
@@ -20,6 +22,7 @@ class Car extends Vehicle {
     super(new PVector(x, y, z), yaw);
     super.model = loadShape(modelPath);
     super.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
+    musicFile = new SoundFile(parent, "..\\resources\\music.wav");
   }
 
   /*
@@ -81,5 +84,15 @@ class Car extends Vehicle {
     } else if(!isHonk) {
       soundPlayed = false;
     }
+    
+    if (isMusic && !musicFile.isPlaying()) {
+      musicFile.loop();
+    } else if (!isMusic && musicFile.isPlaying()) {
+      musicFile.stop();
+    }
+  }
+  
+  void toggleMusic() {
+    isMusic = !isMusic;
   }
 }

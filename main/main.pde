@@ -106,7 +106,9 @@ void keyPressed() {
     case 'e': case 'E':
       car1.toggleLights(); break;
     case 'b': case 'B':
-      car1.toggleBounce(); break;
+      car1.toggleBounce();
+      car1.toggleMusic();
+      break;
   }
   setControl(keyCode, true);
 }
