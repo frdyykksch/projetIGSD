@@ -130,20 +130,19 @@ class Circuit {
   }
 
   boolean isCollision(float x, float carY, float z) {
-  if(samplePoints == null) return false;
-  float yTolerance = 150;
-  for(PVector p : samplePoints) {
-    if(abs(p.y - carY) > yTolerance) continue;
-    float dxz = dist(x, 0, z, p.x, 0, p.z);
-    if(dxz < largeurRoute) return true;
+    if(samplePoints == null) return false;
+    for(PVector p : samplePoints) {
+      float dxz = dist(x, 0, z, p.x, 0, p.z);
+      if(dxz < largeurRoute) {
+        if(carY >= p.y) return true;
+      }
+    } return false;
   }
-  return false;
-}
 
   float getRoadY(float x, float carY, float z) {
     float closestDist = Float.MAX_VALUE;
     float closestY = carY;
-    float yTolerance = 150;
+    float yTolerance = 150; // circuit au dessus
 
     for(PVector p : samplePoints) {
       if(abs(p.y - carY) > yTolerance) continue;
@@ -153,8 +152,7 @@ class Circuit {
         closestDist = d;
         closestY = p.y;
       }
-    }
-    return closestY;
+    } return closestY;
   }
 
   PVector getSpawnPoint() {

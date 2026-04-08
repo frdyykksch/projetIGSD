@@ -43,7 +43,8 @@ class Vehicle {
     oldY = pos.y;
 
     float roadY = c.getRoadY(pos.x, pos.y, pos.z);
-    if(c.isCollision(pos.x, pos.y, pos.z)) {
+    
+    if(c.isCollision(pos.x, pos.y, pos.z) && vy >= 0) {
       pos.y = roadY;
       vy = 0;
     } else {
@@ -236,4 +237,3 @@ class Vehicle {
     isBounce = !isBounce; bounceTimer = 0;
   }
 }
-

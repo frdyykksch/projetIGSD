@@ -6,8 +6,11 @@ class Car extends Vehicle {
   float bwdSpeed = -2.5;
   float stdYaw = 0.03;
 
-  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak, isReverseCam;
+  float jumpForce = -5.0;
+
+  boolean isLeft, isRight, isUp, isDown, isHonk, isBoost, isBreak, isReverseCam, isJump;
   boolean canBoost;
+
 
   /*
    * CONSTRUCTORS
@@ -23,14 +26,10 @@ class Car extends Vehicle {
    */
   @Override
   void update(Circuit c) {
-    if(isBoost && speed > 0) {
-      boostCooldown -= 0.1;
-    } else {
-      boostCooldown += 0.08;
-    }
+    boostCooldown += (isBoost && speed > 0) ? -0.1 : 0.08;
     boostCooldown = constrain(boostCooldown, 0.0, 20.0);
-
     canBoost = boostCooldown > 0.5;
+
     if(isUp) {
       speed = (isBoost && canBoost) ? boostSpeed : fwdSpeed;
     } else if(isDown) {
@@ -38,8 +37,6 @@ class Car extends Vehicle {
     } else {
       speed *= 0.96;
     }
-
-    if(isBreak) speed *= 0.7;
 
     if(isLeft) {
       yaw -= stdYaw;
@@ -49,6 +46,15 @@ class Car extends Vehicle {
       roll = 0.15 * (speed / 6.0);
     } else {
       roll = lerp(roll, 0, 0.1);
+    }
+    
+    if(isBreak) speed *= 0.67;
+
+
+    boolean onGround = c.isCollision(pos.x, pos.y, pos.z);
+    if(isJump && onGround) {
+      vy = jumpForce;
+      pos.y -= 2;
     }
 
     super.update(c);

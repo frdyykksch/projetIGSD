@@ -134,6 +134,8 @@ void setControl(int code, boolean state) {
       car1.isHonk = state; break;
     case 'r': case 'R':
       car1.isReverseCam = state; break;
+    case 'c': case 'C':
+      car1.isJump = state; break;
   }
 }
 
