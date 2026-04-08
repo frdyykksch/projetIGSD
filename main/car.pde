@@ -60,7 +60,7 @@ class Car extends Vehicle {
         if(isBoost && canBoost) {
           speed = boostSpeed * 0.6;
         } else {
-          speed = fwdSpeed * 0.72;
+          speed = fwdSpeed * 0.68;
         }
       } else {
         speed = min(speed, 1.0);

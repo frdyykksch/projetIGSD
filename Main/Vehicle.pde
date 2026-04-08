@@ -165,7 +165,7 @@ class Vehicle {
   }
 
   void bounce() {
-    bounceTimer += 0.02;
+    bounceTimer += 0.025;
     if(bounceTimer >= 1.0) bounceTimer = 0;
     float t = bounceTimer;
 

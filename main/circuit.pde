@@ -174,7 +174,7 @@ class Circuit {
     if(!isNight) {
       float circuitCenterX = 1000;
       float circuitCenterZ = 750;
-      float lightHeight = -2000; // Very high above circuit
+      float lightHeight = -2000;
       pointLight(255, 255, 255, circuitCenterX, lightHeight, circuitCenterZ);
     }
   }
@@ -187,14 +187,14 @@ class Circuit {
 
     float vScale = fenceTexture.height;
 
-    PShape leftFence = buildFenceStrip(fenceTexture, 0, fenceWidth, vScale, 0, 0, fenceHeight);
-    PShape rightFence = buildFenceStrip(fenceTexture, fenceTexture.width, fenceWidth, vScale, 0, 0, fenceHeight);
+    PShape leftFence = buildFenceStrip(fenceTexture, 0, vScale, 0, fenceHeight, true);
+    PShape rightFence = buildFenceStrip(fenceTexture, fenceTexture.width, vScale, 0, fenceHeight, false);
 
     fenceShape.addChild(leftFence);
     fenceShape.addChild(rightFence);
   }
 
-  PShape buildFenceStrip(PImage tex, float u1, float u2, float yScale, float yOff1, float yOff2, float height) {
+  PShape buildFenceStrip(PImage tex, float uTex, float vScale, float yOff, float height, boolean isLeft) {
     PShape strip = createShape();
     strip.beginShape(TRIANGLE_STRIP);
     strip.textureMode(IMAGE);
@@ -211,21 +211,22 @@ class Circuit {
       PVector tangent = PVector.sub(nextPt, pt).normalize();
       PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
 
-      PVector left = PVector.sub(pt, n);
-      PVector right = PVector.add(pt, n);
+      PVector edge = isLeft ? PVector.sub(pt, n) : PVector.add(pt, n);
 
-      strip.vertex(left.x, left.y + yOff1, left.z, u1, vTex);
-      strip.vertex(left.x, left.y + yOff1 - height, left.z, u1, vTex + height * yScale);
+      strip.vertex(edge.x, edge.y + yOff, edge.z, uTex, vTex);
+      strip.vertex(edge.x, edge.y + yOff - height, edge.z, uTex, vTex + height * vScale);
 
-      vTex += PVector.dist(pt, nextPt) * yScale;
+      vTex += PVector.dist(pt, nextPt) * vScale;
     }
     PVector pStart = samplePoints.get(0);
     PVector pNext = samplePoints.get(1);
     PVector tangentStart = PVector.sub(pNext, pStart).normalize();
     PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
 
-    strip.vertex(pStart.x - nStart.x, pStart.y + yOff1, pStart.z - nStart.z, u1, vTex);
-    strip.vertex(pStart.x - nStart.x, pStart.y + yOff1 - height, pStart.z - nStart.z, u1, vTex + height * yScale);
+    PVector edgeStart = isLeft ? PVector.sub(pStart, nStart) : PVector.add(pStart, nStart);
+
+    strip.vertex(edgeStart.x, edgeStart.y + yOff, edgeStart.z, uTex, vTex);
+    strip.vertex(edgeStart.x, edgeStart.y + yOff - height, edgeStart.z, uTex, vTex + height * vScale);
 
     strip.endShape();
     return strip;
