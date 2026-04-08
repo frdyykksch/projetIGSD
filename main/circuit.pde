@@ -11,6 +11,7 @@ class Circuit {
   PImage fenceTexture;
   PShape circuitShape;
   PShape fenceShape;
+  int fenceIntervalle = 50;
 
   /*
    * CONSTRUCTORS
@@ -43,7 +44,7 @@ class Circuit {
     roadTile = loadImage("../resources/roadTile.jpg");
     fenceTexture = loadImage("../resources/startBanner/Fence.png");
     setupCircuit();
-    setupFences(50, 80);
+    setupFences(50, 80, 4);
   }
 
   /*
@@ -51,7 +52,7 @@ class Circuit {
    */
   void setupCircuit() {
     circuitShape = buildStrip(roadTile, 0, roadTile.width, 0, roadTile.height / 80.0);
-    setupFences(50, 80);
+    setupFences(50, 80, 4);
   }
 
   PShape buildStrip(PImage tex, float u1, float u2, float yOff, float yScale) {
@@ -177,22 +178,23 @@ class Circuit {
     }
   }
 
-  void setupFences(float fenceHeight, float fenceWidth) {
+  void setupFences(float fenceHeight, float fenceWidth, int intervalle) {
     if(fenceTexture == null) return;
 
+    this.fenceIntervalle = intervalle;
     fenceShape = createShape(GROUP);
     noStroke();
 
     float vScale = fenceTexture.height;
 
-    PShape leftFence = buildFenceStrip(fenceTexture, 0, vScale, 0, fenceHeight, true);
-    PShape rightFence = buildFenceStrip(fenceTexture, fenceTexture.width, vScale, 0, fenceHeight, false);
+    PShape leftFence = buildFenceStrip(fenceTexture, 0, vScale, 0, fenceHeight, true, intervalle);
+    PShape rightFence = buildFenceStrip(fenceTexture, fenceTexture.width, vScale, 0, fenceHeight, false, intervalle);
 
     fenceShape.addChild(leftFence);
     fenceShape.addChild(rightFence);
   }
 
-  PShape buildFenceStrip(PImage tex, float uTex, float vScale, float yOff, float height, boolean isLeft) {
+  PShape buildFenceStrip(PImage tex, float uTex, float vScale, float yOff, float height, boolean isLeft, int intervalle) {
     PShape strip = createShape();
     strip.beginShape(TRIANGLE_STRIP);
     strip.textureMode(IMAGE);
@@ -202,9 +204,9 @@ class Circuit {
     float vTex = 0;
     int m = samplePoints.size();
 
-    for(int i = 0; i < m; i++) {
+    for(int i = 0; i < m; i += intervalle) {
       PVector pt = samplePoints.get(i);
-      PVector nextPt = samplePoints.get((i + 1) % m);
+      PVector nextPt = samplePoints.get((i + intervalle) % m);
 
       PVector tangent = PVector.sub(nextPt, pt).normalize();
       PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
@@ -216,17 +218,31 @@ class Circuit {
 
       vTex += PVector.dist(pt, nextPt) * vScale;
     }
-    PVector pStart = samplePoints.get(0);
-    PVector pNext = samplePoints.get(1);
-    PVector tangentStart = PVector.sub(pNext, pStart).normalize();
-    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
-
-    PVector edgeStart = isLeft ? PVector.sub(pStart, nStart) : PVector.add(pStart, nStart);
-
-    strip.vertex(edgeStart.x, edgeStart.y + yOff, edgeStart.z, uTex, vTex);
-    strip.vertex(edgeStart.x, edgeStart.y + yOff - height, edgeStart.z, uTex, vTex + height * vScale);
 
     strip.endShape();
     return strip;
+  }
+
+  ArrayList<PVector>[] getFenceBoundaries() {
+    ArrayList<PVector>[] fences = new ArrayList[2];
+    fences[0] = new ArrayList<PVector>(); // Left fence
+    fences[1] = new ArrayList<PVector>(); // Right fence
+    
+    int m = samplePoints.size();
+    for(int i = 0; i < m; i += fenceIntervalle) {
+      PVector pt = samplePoints.get(i);
+      PVector nextPt = samplePoints.get((i + fenceIntervalle) % m);
+      
+      PVector tangent = PVector.sub(nextPt, pt).normalize();
+      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
+      
+      PVector leftFence = PVector.sub(pt, n);
+      PVector rightFence = PVector.add(pt, n);
+      
+      fences[0].add(leftFence);
+      fences[1].add(rightFence);
+    }
+    
+    return fences;
   }
 }
