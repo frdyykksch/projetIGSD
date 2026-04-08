@@ -135,11 +135,10 @@ class Vehicle {
   }
 
   void checkBannerCollision(PVector bannerPos) {
-    float collisionRadius = 40; // Collision radius for the banner
+    float collisionRadius = 40;
     float distance = dist(pos.x, pos.y, pos.z, bannerPos.x, bannerPos.y, bannerPos.z);
 
     if(distance < collisionRadius) {
-      // Push the vehicle back from the banner
       float pushBackDistance = collisionRadius - distance;
       PVector direction = PVector.sub(pos, bannerPos);
       direction.normalize();

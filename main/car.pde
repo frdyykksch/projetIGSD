@@ -4,6 +4,7 @@ class Car extends Vehicle {
    */
   float fwdSpeed = 5.8;
   float bwdSpeed = -2.5;
+  float acceleration = 0.05;
   float stdYaw = 0.03;
 
   float jumpForce = -5.0;
@@ -31,7 +32,8 @@ class Car extends Vehicle {
     canBoost = boostCooldown > 0.5;
 
     if(isUp) {
-      speed = (isBoost && canBoost) ? boostSpeed : fwdSpeed;
+      float targetSpeed = (isBoost && canBoost) ? boostSpeed : fwdSpeed;
+      speed = lerp(speed, targetSpeed, acceleration);
     } else if(isDown) {
       speed = (isBoost && canBoost) ? bwdSpeed * 1.5 : bwdSpeed;
     } else {
