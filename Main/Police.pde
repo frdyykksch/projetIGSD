@@ -3,14 +3,17 @@ class Police extends Vehicle {
 	 * ATTRIBUTES
 	 */
   int targetIndex = 0;
+  SoundFile collisionSound;
+  boolean collisionSoundPlayed = false;
 
 	/*
    * CONSTRUCTORS
    */
   Police(PApplet parent, float x, float y, float z, float yaw, String modelPath) {
     super(new PVector(x, y, z), yaw);
-    super.speed = 3;
+    super.speed = 6;
     super.model = loadShape(modelPath);
+    collisionSound = new SoundFile(parent, "..\\resources\\policeBump.wav");
   }
 
 	/*
@@ -74,5 +77,16 @@ class Police extends Vehicle {
       yaw = 0;
       targetIndex = 0;
     }
+  }
+  
+  void playCollisionSound() {
+    if(!collisionSoundPlayed && collisionSound != null) {
+      collisionSound.play();
+      collisionSoundPlayed = true;
+    }
+  }
+  
+  void resetCollisionSound() {
+    collisionSoundPlayed = false;
   }
 }
