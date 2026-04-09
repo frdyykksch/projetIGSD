@@ -69,10 +69,4 @@ class Camera {
     }
     perspective(PI / 2.5, float(width) / float(height), 1, 10000);
   }
-
-  void look() {
-    float centerY = height / 2.0;
-    cameraPitch = (pmouseY - centerY) * 0.001;
-    cameraPitch = constrain(cameraPitch, -PI/4, PI/4);
-  }
 }

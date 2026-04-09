@@ -8,17 +8,18 @@ class Circuit {
   float largeurRoute;
   int segmentsParCourbe = 1000;
   PImage roadTile;
+  PImage startEndTile;
   PImage fenceTexture;
   PShape circuitShape;
   PShape fenceShape;
-  int fenceSegmentLength = 150; // Length of each fence segment
-  int fenceGapLength = 300;     // Length of gap between segments
+  int fenceSegmentLength = 150;
+  int fenceGapLength = 300;
 
   /*
    * CONSTRUCTORS
    */
-  Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile) {
-    this.nomCircuit = nomCircuit; this.points = points; this.largeurRoute = largeurRoute; this.roadTile = loadImage(roadTileFile);
+  Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile, String startEndTileFile) {
+    this.nomCircuit = nomCircuit; this.points = points; this.largeurRoute = largeurRoute; this.roadTile = loadImage(roadTileFile); this.startEndTile = loadImage(startEndTileFile);
     this.samplePoints = sampleCircuit(segmentsParCourbe);
     setupCircuit();
   }
@@ -42,8 +43,9 @@ class Circuit {
 
     this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
-    roadTile = loadImage("../resources/roadTile.jpg");
-    fenceTexture = loadImage("../resources/startBanner/Fence.png");
+    roadTile = loadImage("..\\resources\\roadTile.jpg");
+    startEndTile = loadImage("..\\resources\\endTile.jpg");
+    fenceTexture = loadImage("..\\resources\\startBanner\\Fence.png");
     setupCircuit();
     setupFences(50, 80);
   }
@@ -52,15 +54,16 @@ class Circuit {
    * METHODS
    */
   void setupCircuit() {
-    circuitShape = buildStrip(roadTile, 0, roadTile.width, 0, roadTile.height / 80.0);
+    circuitShape = buildStrip(roadTile, startEndTile, 0, roadTile.width, 0, roadTile.height / 80.0);
     setupFences(50, 80);
   }
 
-  PShape buildStrip(PImage tex, float u1, float u2, float yOff, float yScale) {
+  PShape buildStrip(PImage tex, PImage endTex, float u1, float u2, float yOff, float yScale) {
+    PShape group = createShape(GROUP);
     PShape strip = createShape();
     strip.beginShape(TRIANGLE_STRIP);
     strip.textureMode(IMAGE);
-    strip.texture(tex);
+    strip.texture(endTex);
     strip.noStroke();
 
     float vTex = 0;
@@ -80,6 +83,7 @@ class Circuit {
       strip.vertex(right.x, right.y + yOff, right.z, u2, vTex);
 
       vTex += PVector.dist(pt, nextPt) * yScale;
+      strip.texture(tex);
     }
     PVector pStart = samplePoints.get(0);
     PVector pNext = samplePoints.get(1);

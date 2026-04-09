@@ -16,15 +16,20 @@ GUI gui;
 Props startBanner;
 
 PImage controlTip;
-boolean gameStarted = false;
 int startTime;
+
+PShader fog;
 
 void setup() {
   size(800, 800, P3D);
   noStroke();
 
+  // controltips
   controlTip = loadImage("..\\resources\\controlTip.jpg");
   startTime = millis();
+
+  // fogshader
+  fog = loadShader("..\\resources\\shaders\\fogShader.glsl");
 
   // env
   environment = new Environment(isNight);
@@ -40,7 +45,7 @@ void setup() {
   // vehicles
   vehicles = new ArrayList<Vehicle>();
 
-  car1 = new Car(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\mainCar2\\insideCar.obj");
+  car1 = new Car(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\mainCar\\insideCar.obj");
   vehicles.add(car1);
   
   Police car2 = new Police(this, endPos.x, endPos.y, endPos.z, startYaw, "..\\resources\\PoliceCar.obj");
@@ -60,13 +65,13 @@ void setup() {
 }
 
 void draw() {
-  if(!gameStarted && millis() - startTime < 4000) {
+  if(millis() - startTime < 3000) {
     image(controlTip, 0, 0, width, height);
     return;
-  } gameStarted = true;
-
+  }
+  
   background(0);
-
+  
   pushMatrix();
   translate(width / 2, height / 2, 0);
   camera.update();
@@ -76,7 +81,7 @@ void draw() {
   
   circuitF1.lightCircuit(isNight);
   circuitF1.display();
-
+  
   for(Vehicle v : vehicles) {
     v.backLights();
     v.frontLights();
@@ -86,20 +91,26 @@ void draw() {
     // v.checkBannerCollision(startPos);
     v.display();
   }
-
+  
   
   startBanner.drawBanner();
   popMatrix();
-
+  
   minimap.drawCarsMap(-100, -100, isNight, car1, vehicles);
   gui.drawGUI();
+
+  // ca c'est le gpt qui m'a fait/expliqué mais je comprends ducoup c'est pas mal
+  fog.set("u_time", millis() / 1000.0);
+  fog.set("u_resolution", (float)width, (float)height);
+  fog.set("u_nightMode", isNight ? 0.5 : 0.0);
+
+filter(fog);
 }
 
 // toggle
 void keyPressed() {
-  if(!gameStarted) gameStarted = true;
   switch(key) {
-    case 'n': case 'N': 
+    case 'n': case 'N':
       isNight = !isNight; environment.setNightMode(isNight); break;
     case 'q': case 'Q':
       firstPerson = !firstPerson; break;
@@ -138,11 +149,5 @@ void setControl(int code, boolean state) {
       car1.isReverseCam = state; break;
     case 'c': case 'C':
       car1.isJump = state; break;
-  }
-}
-
-void mouseMoved() {
-  if(firstPerson) {
-    camera.look();
   }
 }

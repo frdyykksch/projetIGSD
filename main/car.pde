@@ -21,8 +21,8 @@ class Car extends Vehicle {
   Car(PApplet parent, float x, float y, float z, float yaw, String modelPath) {
     super(new PVector(x, y, z), yaw);
     super.model = loadShape(modelPath);
-    super.file = new SoundFile(parent, "..\\resources\\car_horn.mp3");
-    musicFile = new SoundFile(parent, "..\\resources\\music.wav");
+    super.file = new SoundFile(parent, "..\\resources\\audio\\car_horn.mp3");
+    musicFile = new SoundFile(parent, "..\\resources\\audio\\music.wav");
   }
 
   /*
@@ -55,7 +55,7 @@ class Car extends Vehicle {
     
     if(isBreak) speed *= 0.67;
 
-
+    
     boolean onGround = c.isCollision(pos.x, pos.y, pos.z);
     if(isJump && onGround) {
       vy = jumpForce;
@@ -85,9 +85,9 @@ class Car extends Vehicle {
       soundPlayed = false;
     }
     
-    if (isMusic && !musicFile.isPlaying()) {
+    if(isMusic && !musicFile.isPlaying()) {
       musicFile.loop();
-    } else if (!isMusic && musicFile.isPlaying()) {
+    } else if(!isMusic && musicFile.isPlaying()) {
       musicFile.stop();
     }
   }
