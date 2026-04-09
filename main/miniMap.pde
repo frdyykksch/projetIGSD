@@ -1,7 +1,4 @@
 class Minimap {
-  /*
-   * ATTRIBUTES
-   */
   PGraphics minimapGraphic;
   Circuit c;
   ArrayList<PVector> points;
@@ -9,9 +6,6 @@ class Minimap {
   float mapSize = 150;
   float mapX, mapY;
 
-	/*
-   * CONSTRUCTORS
-   */
   Minimap(Circuit c) {
     this.c = c;
     this.points = c.samplePoints;
@@ -19,9 +13,6 @@ class Minimap {
     calculateBounds();
   }
 
-	/*
-   * METHODS
-   */
   void calculateBounds() {
     minX = points.get(0).x;
     maxX = points.get(0).x;

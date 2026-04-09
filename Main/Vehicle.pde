@@ -1,7 +1,4 @@
 class Vehicle {
-  /*
-   * ATTRIBUTES
-   */
   PVector pos;
   float oldY;
   float speed;
@@ -24,9 +21,6 @@ class Vehicle {
   boolean isBounce = false;
   float bounceTimer = 0;
 
-  /*
-   * CONSTRUCTORS
-   */
   Vehicle(PVector p, float y) {
     pos = p;
     yaw = y;
@@ -34,10 +28,6 @@ class Vehicle {
     speed = 0;
     vy = 0;
   }
-
-  /*
-   * METHODS
-   */
   void update(Circuit c) {
     pos.x += speed * cos(yaw);
     pos.z += speed * sin(yaw);
@@ -60,10 +50,9 @@ class Vehicle {
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
 
-    // Decrement fence collision cooldown
+    // on decremente
     fenceCollisionCooldown -= 0.016; // ~60 FPS
     
-    // Check fence collision
     fenceCollision(c.getFenceBoundaries());
 
     if(pos.y > 500) {

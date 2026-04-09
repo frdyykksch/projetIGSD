@@ -101,8 +101,11 @@ void draw() {
   startBanner.drawBanner();
   popMatrix();
 
+  hint(DISABLE_DEPTH_TEST);
+  resetShader();
   minimap.drawCarsMap(-100, -100, isNight, car1, vehicles);
   gui.drawGUI();
+  hint(ENABLE_DEPTH_TEST);
 }
 
 // toggle
