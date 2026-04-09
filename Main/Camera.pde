@@ -27,7 +27,6 @@ class Camera {
     float camY = targetCar.pos.y - cameraHeight;
     float camZ = targetCar.pos.z - sin(targetCar.yaw) * cameraDistance;
 
-    // reverse cam
     if(targetCar.isReverseCam) {
       float rcamDist = 50;
       float rcamHeight = 20;

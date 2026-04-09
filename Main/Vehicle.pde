@@ -1,12 +1,10 @@
 class Vehicle {
-  /*
-   * ATTRIBUTES
-   */
   PVector pos;
   float oldY;
   float speed;
   float boostSpeed = 13.0;
   float boostCooldown = 20.0;
+  float fenceCollisionCooldown;
 
   float yaw = 0;
   float roll = 0;
@@ -23,9 +21,6 @@ class Vehicle {
   boolean isBounce = false;
   float bounceTimer = 0;
 
-  /*
-   * CONSTRUCTORS
-   */
   Vehicle(PVector p, float y) {
     pos = p;
     yaw = y;
@@ -33,10 +28,6 @@ class Vehicle {
     speed = 0;
     vy = 0;
   }
-
-  /*
-   * METHODS
-   */
   void update(Circuit c) {
     pos.x += speed * cos(yaw);
     pos.z += speed * sin(yaw);
@@ -59,7 +50,9 @@ class Vehicle {
     float targetPitch = atan2(nextRoadY - roadY, lookAhead);
     pitch = lerp(pitch, targetPitch, 0.2);
 
-    // Check fence collision
+    // on decremente
+    fenceCollisionCooldown -= 0.016; // ~60 FPS
+    
     fenceCollision(c.getFenceBoundaries());
 
     if(pos.y > 500) {
@@ -95,32 +88,30 @@ class Vehicle {
     float backLightX = pos.x - lightDistance * cos(yaw);
     float backLightZ = pos.z - lightDistance * sin(yaw);
     float backLightY = pos.y;
+    
     if(!isNight) {
-      pointLight(255, 255, 255, backLightX+20, backLightY-20, backLightZ);
+      float intensity = 255 * (1.0 / (1.0 + 0.02 * lightDistance)); 
+      pointLight(intensity, intensity, intensity, backLightX+20, backLightY-20, backLightZ);
     }
     if(lightOn && isNight) {
-      pointLight(255, 0, 0, backLightX, backLightY-10, backLightZ);
-      pointLight(100, 100, 100, backLightX, backLightY-2, backLightZ);
+      float intensity = 255 * (1.0 / (1.0 + 0.02 * lightDistance));
+      pointLight(intensity, 0, 0, backLightX, backLightY-10, backLightZ);
+      pointLight(intensity * 0.4, intensity * 0.4, intensity * 0.4, backLightX, backLightY-2, backLightZ);
     }
     if(lightOn && !isNight) {
-      pointLight(255, 0, 0, backLightX-10, backLightY-10, backLightZ);
+      float intensity = 255 * (1.0 / (1.0 + 0.02 * lightDistance));
+      pointLight(intensity, 0, 0, backLightX-10, backLightY-10, backLightZ);
     }
   }
 
   void frontLights() {
-    if(lightOn && isNight) {
+    if(lightOn) {
       float lightDistance = 25;
       float frontLightX = pos.x + lightDistance * cos(yaw);
       float frontLightZ = pos.z + lightDistance * sin(yaw);
       float frontLightY = pos.y;
-      pointLight(255, 255, 0, frontLightX+13, frontLightY-10, frontLightZ);
-    }
-    if(lightOn && !isNight) {
-      float lightDistance = 25;
-      float frontLightX = pos.x + lightDistance * cos(yaw);
-      float frontLightZ = pos.z + lightDistance * sin(yaw);
-      float frontLightY = pos.y;
-      pointLight(255, 255, 0, frontLightX+13, frontLightY-10, frontLightZ);
+      float intensity = 255 * (1.0 / (1.0 + 0.02 * lightDistance)); 
+      pointLight(intensity, intensity * 0.8, 0, frontLightX+13, frontLightY-10, frontLightZ);
     }
   }
 
@@ -150,12 +141,22 @@ class Vehicle {
   void checkVehicleCollision(Vehicle other) {
     PVector diff = PVector.sub(pos, other.pos);
     float collDistSquared = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
-    int maxDist = 35;
+    int maxDist = 30;
     if(collDistSquared < maxDist * maxDist && collDistSquared > 0) {
       diff.normalize();
-      float pushStrength = maxDist - sqrt(collDistSquared);
+      float pushStrength = (maxDist - sqrt(collDistSquared)) * 1.8;
       pos.add(PVector.mult(diff, pushStrength));
       other.pos.sub(PVector.mult(diff, pushStrength));
+      if(this instanceof Car) {
+        ((Car)this).playCollisionSound();
+      } else if(this instanceof Police) {
+        ((Police)this).playCollisionSound();
+      }
+      if(other instanceof Car) {
+        ((Car)other).playCollisionSound();
+      } else if(other instanceof Police) {
+        ((Police)other).playCollisionSound();
+      }
     }
   }
 
@@ -172,9 +173,7 @@ class Vehicle {
     
     ArrayList<PVector> leftFence = fenceBoundaries[0];
     ArrayList<PVector> rightFence = fenceBoundaries[1];
-    float maxDist = 8; // Collision radius from fence - reduced to avoid interfering with pathfinding
-    
-    // Find closest left fence point
+    float maxDist = 22; 
     PVector closestLeft = null;
     float closestLeftDist = Float.MAX_VALUE;          
     for(PVector p : leftFence) {
@@ -186,7 +185,6 @@ class Vehicle {
       }
     }
     
-    // Find closest right fence point
     PVector closestRight = null;
     float closestRightDist = Float.MAX_VALUE;
     for(PVector p : rightFence) {
@@ -197,18 +195,36 @@ class Vehicle {
         closestRight = diff;
       }
     }
-    
-    // Only collide with closest point if within maxDist
+  
     if(closestLeftDist < maxDist && closestLeft != null) {
       closestLeft.normalize();
       pos.add(PVector.mult(closestLeft, maxDist - closestLeftDist));
       speed *= 0.9;
+      
+      if(fenceCollisionCooldown <= 0) {
+        if(this instanceof Car) {
+          ((Car)this).playCollisionSound();
+        } else if(this instanceof Police) {
+          ((Police)this).playCollisionSound();
+        }
+        fenceCollisionCooldown = 0.9;
+      }
     }
     
     if(closestRightDist < maxDist && closestRight != null) {
       closestRight.normalize();
       pos.add(PVector.mult(closestRight, maxDist - closestRightDist));
       speed *= 0.9;
+      
+
+      if(fenceCollisionCooldown <= 0) {
+        if(this instanceof Car) {
+          ((Car)this).playCollisionSound();
+        } else if(this instanceof Police) {
+          ((Police)this).playCollisionSound();
+        }
+        fenceCollisionCooldown = 0.9; 
+      }
     }
   }
 

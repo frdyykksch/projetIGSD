@@ -48,7 +48,7 @@ void setup() {
   car1 = new Car(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\mainCar\\insideCar.obj");
   vehicles.add(car1);
   
-  Police car2 = new Police(this, endPos.x, endPos.y, endPos.z, startYaw, "..\\resources\\PoliceCar.obj");
+  Police car2 = new Police(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\PoliceCar.obj");
   vehicles.add(car2);
   car2.toggleBounce();
   
@@ -85,6 +85,18 @@ void draw() {
   for(Vehicle v : vehicles) {
     v.backLights();
     v.frontLights();
+  }
+  
+  circuitF1.lightCircuit(isNight);
+  circuitF1.display();
+
+  // Reset collision sounds and update vehicles
+  for(Vehicle v : vehicles) {
+    if(v instanceof Car) {
+      ((Car)v).resetCollisionSound();
+    } else if(v instanceof Police) {
+      ((Police)v).resetCollisionSound();
+    }
     v.update(circuitF1);
     v.checkAllVehicleCollisions(vehicles);
     v.fenceCollision(circuitF1.getFenceBoundaries());

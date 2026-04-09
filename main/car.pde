@@ -1,7 +1,4 @@
 class Car extends Vehicle {
-  /*
-   * ATTRIBUTES
-   */
   float fwdSpeed = 5.8;
   float bwdSpeed = -2.5;
   float acceleration = 0.05;
@@ -13,21 +10,17 @@ class Car extends Vehicle {
   boolean canBoost;
   
   SoundFile musicFile;
+  SoundFile collisionSound;
+  boolean collisionSoundPlayed = false;
 
-
-  /*
-   * CONSTRUCTORS
-   */
   Car(PApplet parent, float x, float y, float z, float yaw, String modelPath) {
     super(new PVector(x, y, z), yaw);
     super.model = loadShape(modelPath);
-    super.file = new SoundFile(parent, "..\\resources\\audio\\car_horn.mp3");
-    musicFile = new SoundFile(parent, "..\\resources\\audio\\music.wav");
+    super.file = new SoundFile(parent, "..\\resources\\car_horn.wav");
+    musicFile = new SoundFile(parent, "..\\resources\\music.wav");
+    collisionSound = new SoundFile(parent, "..\\resources\\car1Bump.wav");
   }
 
-  /*
-   * METHODS
-   */
   @Override
   void update(Circuit c) {
     boostCooldown += (isBoost && speed > 0) ? -0.1 : 0.08;
@@ -94,5 +87,16 @@ class Car extends Vehicle {
   
   void toggleMusic() {
     isMusic = !isMusic;
+  }
+  
+  void playCollisionSound() {
+    if(!collisionSoundPlayed && collisionSound != null) {
+      collisionSound.play();
+      collisionSoundPlayed = true;
+    }
+  }
+  
+  void resetCollisionSound() {
+    collisionSoundPlayed = false;
   }
 }

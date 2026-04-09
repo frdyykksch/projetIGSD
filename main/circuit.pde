@@ -1,16 +1,17 @@
 class Circuit {
-  /*
-   * ATTRIBUTES
-   */
   String nomCircuit;
   ArrayList<PVector> points;
   ArrayList<PVector> samplePoints;
+
   float largeurRoute;
   int segmentsParCourbe = 1000;
+
   PImage roadTile;
-  PImage startEndTile;
-  PImage fenceTexture;
+  PImage startCircuitTile;
+
   PShape circuitShape;
+
+  PImage fenceTexture;
   PShape fenceShape;
   int fenceSegmentLength = 150;
   int fenceGapLength = 300;
@@ -19,7 +20,7 @@ class Circuit {
    * CONSTRUCTORS
    */
   Circuit(String nomCircuit, ArrayList<PVector> points, int largeurRoute, String roadTileFile, String startEndTileFile) {
-    this.nomCircuit = nomCircuit; this.points = points; this.largeurRoute = largeurRoute; this.roadTile = loadImage(roadTileFile); this.startEndTile = loadImage(startEndTileFile);
+    this.nomCircuit = nomCircuit; this.points = points; this.largeurRoute = largeurRoute; this.roadTile = loadImage(roadTileFile); this.startCircuitTile = loadImage(startEndTileFile);
     this.samplePoints = sampleCircuit(segmentsParCourbe);
     setupCircuit();
   }
@@ -43,9 +44,9 @@ class Circuit {
 
     this.largeurRoute = 100;
     samplePoints = sampleCircuit(segmentsParCourbe);
-    roadTile = loadImage("..\\resources\\roadTile.jpg");
-    startEndTile = loadImage("..\\resources\\endTile.jpg");
-    fenceTexture = loadImage("..\\resources\\startBanner\\Fence.png");
+    roadTile = loadImage("../resources/roadTile.jpg");
+    fenceTexture = loadImage("../resources/startBanner/Fence.png");
+    startCircuitTile = loadImage("../resources/startTile.jpg");
     setupCircuit();
     setupFences(50, 80);
   }
@@ -54,16 +55,117 @@ class Circuit {
    * METHODS
    */
   void setupCircuit() {
-    circuitShape = buildStrip(roadTile, startEndTile, 0, roadTile.width, 0, roadTile.height / 80.0);
+    circuitShape = createShape(GROUP);
+    PShape startTile = buildStartTile(startCircuitTile, 0, startCircuitTile.width, 0, startCircuitTile.height / 80.0);
+    circuitShape.addChild(startTile);
+    PShape mainRoad = buildMainRoad(roadTile, 0, roadTile.width, 0, roadTile.height / 80.0);
+    circuitShape.addChild(mainRoad);
+    
     setupFences(50, 80);
   }
 
-  PShape buildStrip(PImage tex, PImage endTex, float u1, float u2, float yOff, float yScale) {
-    PShape group = createShape(GROUP);
+  PShape buildStartTile(PImage tex, float u1, float u2, float yOff, float yScale) {
     PShape strip = createShape();
     strip.beginShape(TRIANGLE_STRIP);
     strip.textureMode(IMAGE);
-    strip.texture(endTex);
+    strip.texture(tex);
+    strip.noStroke();
+
+    float vTex = 0;
+    float tileHeight = tex.height;
+    int m = samplePoints.size();
+    int endIndex = 0;
+
+    for(int i = 0; i < m; i++) {
+      PVector pt = samplePoints.get(i);
+      PVector nextPt = samplePoints.get((i + 1) % m);
+
+      PVector tangent = PVector.sub(nextPt, pt).normalize();
+      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
+
+      PVector left = PVector.sub(pt, n);
+      PVector right = PVector.add(pt, n);
+
+      strip.vertex(left.x, left.y + yOff, left.z, u1, vTex);
+      strip.vertex(right.x, right.y + yOff, right.z, u2, vTex);
+
+      vTex += PVector.dist(pt, nextPt) * yScale;
+      
+      if(vTex >= tileHeight) {
+        endIndex = i;
+        break;
+      }
+    }
+    
+    PVector pEnd = samplePoints.get(endIndex);
+    PVector pNext = samplePoints.get((endIndex + 1) % m);
+    PVector tangentEnd = PVector.sub(pNext, pEnd).normalize();
+    PVector nEnd = new PVector(-tangentEnd.z, 0, tangentEnd.x).normalize().mult(largeurRoute);
+
+    strip.vertex(pEnd.x - nEnd.x, pEnd.y + yOff, pEnd.z - nEnd.z, u1, vTex);
+    strip.vertex(pEnd.x + nEnd.x, pEnd.y + yOff, pEnd.z + nEnd.z, u2, vTex);
+
+    strip.endShape();
+    return strip;
+  }
+
+  PShape buildMainRoad(PImage tex, float u1, float u2, float yOff, float yScale) {
+    PShape strip = createShape();
+    strip.beginShape(TRIANGLE_STRIP);
+    strip.textureMode(IMAGE);
+    strip.texture(tex);
+    strip.noStroke();
+
+    float vTex = 0;
+    float startTileHeight = startCircuitTile.height;
+    int m = samplePoints.size();
+    int startIndex = 0;
+
+    for(int i = 0; i < m; i++) {
+      PVector pt = samplePoints.get(i);
+      PVector nextPt = samplePoints.get((i + 1) % m);
+      float dist = PVector.dist(pt, nextPt) * yScale;
+      vTex += dist;
+      
+      if(vTex >= startTileHeight) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    vTex = 0;
+    for(int i = startIndex; i < m; i++) {
+      PVector pt = samplePoints.get(i);
+      PVector nextPt = samplePoints.get((i + 1) % m);
+
+      PVector tangent = PVector.sub(nextPt, pt).normalize();
+      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
+
+      PVector left = PVector.sub(pt, n);
+      PVector right = PVector.add(pt, n);
+
+      strip.vertex(left.x, left.y + yOff, left.z, u1, vTex);
+      strip.vertex(right.x, right.y + yOff, right.z, u2, vTex);
+
+      vTex += PVector.dist(pt, nextPt) * yScale;
+    }
+    
+    PVector pStart = samplePoints.get(0);
+    PVector pNext = samplePoints.get(1);
+    PVector tangentStart = PVector.sub(pNext, pStart).normalize();
+    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
+
+    strip.vertex(pStart.x - nStart.x, pStart.y + yOff, pStart.z - nStart.z, u1, vTex);
+    strip.vertex(pStart.x + nStart.x, pStart.y + yOff, pStart.z + nStart.z, u2, vTex);
+
+    strip.endShape();
+    return strip;
+  }
+
+  PShape buildStrip(PImage tex, float u1, float u2, float yOff, float yScale) {
+    PShape strip = createShape();
+    strip.beginShape(TRIANGLE_STRIP);
+    strip.textureMode(IMAGE);
     strip.noStroke();
 
     float vTex = 0;
