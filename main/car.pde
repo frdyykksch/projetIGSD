@@ -17,7 +17,7 @@ class Car extends Vehicle {
     super(new PVector(x, y, z), yaw);
     super.model = loadShape(modelPath);
     super.file = new SoundFile(parent, "..\\resources\\car_horn.wav");
-    musicFile = new SoundFile(parent, "..\\resources\\music.wav");
+    musicFile = new SoundFile(parent, "..\\resources\\audio\\music.wav");
     collisionSound = new SoundFile(parent, "..\\resources\\car1Bump.wav");
   }
 

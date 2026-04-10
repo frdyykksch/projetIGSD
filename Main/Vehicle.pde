@@ -28,6 +28,7 @@ class Vehicle {
     speed = 0;
     vy = 0;
   }
+  
   void update(Circuit c) {
     pos.x += speed * cos(yaw);
     pos.z += speed * sin(yaw);
@@ -51,7 +52,7 @@ class Vehicle {
     pitch = lerp(pitch, targetPitch, 0.2);
 
     // on decremente
-    fenceCollisionCooldown -= 0.016; // ~60 FPS
+    fenceCollisionCooldown -= 0.016;
     
     fenceCollision(c.getFenceBoundaries());
 
@@ -173,9 +174,9 @@ class Vehicle {
     
     ArrayList<PVector> leftFence = fenceBoundaries[0];
     ArrayList<PVector> rightFence = fenceBoundaries[1];
-    float maxDist = 22; 
+    float maxDist = 22;
     PVector closestLeft = null;
-    float closestLeftDist = Float.MAX_VALUE;          
+    float closestLeftDist = Float.MAX_VALUE;
     for(PVector p : leftFence) {
       PVector diff = PVector.sub(pos, p);
       float collDist = diff.mag();
@@ -223,7 +224,7 @@ class Vehicle {
         } else if(this instanceof Police) {
           ((Police)this).playCollisionSound();
         }
-        fenceCollisionCooldown = 0.9; 
+        fenceCollisionCooldown = 0.9;
       }
     }
   }

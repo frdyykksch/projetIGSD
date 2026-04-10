@@ -162,43 +162,6 @@ class Circuit {
     return strip;
   }
 
-  PShape buildStrip(PImage tex, float u1, float u2, float yOff, float yScale) {
-    PShape strip = createShape();
-    strip.beginShape(TRIANGLE_STRIP);
-    strip.textureMode(IMAGE);
-    strip.noStroke();
-
-    float vTex = 0;
-    int m = samplePoints.size();
-
-    for(int i = 0; i < m; i++) {
-      PVector pt = samplePoints.get(i);
-      PVector nextPt = samplePoints.get((i + 1) % m);
-
-      PVector tangent = PVector.sub(nextPt, pt).normalize();
-      PVector n = new PVector(-tangent.z, 0, tangent.x).normalize().mult(largeurRoute);
-
-      PVector left = PVector.sub(pt, n);
-      PVector right = PVector.add(pt, n);
-
-      strip.vertex(left.x, left.y + yOff, left.z, u1, vTex);
-      strip.vertex(right.x, right.y + yOff, right.z, u2, vTex);
-
-      vTex += PVector.dist(pt, nextPt) * yScale;
-      strip.texture(tex);
-    }
-    PVector pStart = samplePoints.get(0);
-    PVector pNext = samplePoints.get(1);
-    PVector tangentStart = PVector.sub(pNext, pStart).normalize();
-    PVector nStart = new PVector(-tangentStart.z, 0, tangentStart.x).normalize().mult(largeurRoute);
-
-    strip.vertex(pStart.x - nStart.x, pStart.y + yOff, pStart.z - nStart.z, u1, vTex);
-    strip.vertex(pStart.x + nStart.x, pStart.y + yOff, pStart.z + nStart.z, u2, vTex);
-
-    strip.endShape();
-    return strip;
-  }
-
   void display() {
     textureWrap(REPEAT);
     shape(circuitShape);
@@ -223,8 +186,7 @@ class Circuit {
         float t = s / (float) stepsPerSegment;
         sample.add(cubicBezierPoint(p1, cp1, cp2, p2, t));
       }
-    }
-    return sample;
+    } return sample;
   }
 
   PVector cubicBezierPoint(PVector p0, PVector p1, PVector p2, PVector p3, float t) {
@@ -311,7 +273,6 @@ class Circuit {
     while(i < m) {
       int posInCycle = i % cycleLength;
       
-      // Only render if in segment range, not in gap
       if(posInCycle < fenceSegmentLength) {
         PShape segmentStrip = createShape();
         segmentStrip.beginShape(TRIANGLE_STRIP);
@@ -341,7 +302,6 @@ class Circuit {
         strip.addChild(segmentStrip);
         i = segmentEnd;
       } else {
-        // Skip to next cycle
         i += fenceGapLength;
       }
     }
@@ -351,7 +311,7 @@ class Circuit {
 
   ArrayList<PVector>[] getFenceBoundaries() {
     ArrayList<PVector>[] fences = new ArrayList[2];
-    fences[0] = new ArrayList<PVector>(); 
+    fences[0] = new ArrayList<PVector>();
     fences[1] = new ArrayList<PVector>();
     
     int m = samplePoints.size();
@@ -361,7 +321,6 @@ class Circuit {
     while(i < m) {
       int posInCycle = i % cycleLength;
       
-      // Only add collision points where fences actually are
       if(posInCycle < fenceSegmentLength) {
         int segmentEnd = min(i + fenceSegmentLength, m);
         
@@ -381,7 +340,6 @@ class Circuit {
         
         i = segmentEnd;
       } else {
-        // Skip to next cycle
         i += fenceGapLength;
       }
     }

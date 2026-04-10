@@ -55,8 +55,8 @@ class Police extends Vehicle {
 
     float desiredAngle = atan2(trackDir.z, trackDir.x);
     float delta = desiredAngle - yaw;
-    while (delta > PI) delta -= TWO_PI;
-    while (delta < -PI) delta += TWO_PI;
+    while(delta > PI) delta -= TWO_PI;
+    while(delta < -PI) delta += TWO_PI;
     yaw += delta * 0.1;
 
     super.update(c);

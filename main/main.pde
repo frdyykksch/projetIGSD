@@ -1,5 +1,9 @@
 import processing.sound.*;
 
+/*
+ * ATTRIBUTES
+ */
+
 Environment environment;
 boolean isNight = false;
 
@@ -8,6 +12,7 @@ Minimap minimap;
 
 ArrayList<Vehicle> vehicles;
 Car car1;
+Police car2;
 boolean firstPerson = false;
 
 Camera camera;
@@ -19,6 +24,10 @@ PImage controlTip;
 int startTime;
 
 PShader fog;
+
+/*
+ * METHODS
+ */
 
 void setup() {
   size(800, 800, P3D);
@@ -38,7 +47,6 @@ void setup() {
   circuitF1 = new Circuit();
 
   PVector startPos = circuitF1.getSpawnPoint();
-  PVector endPos = circuitF1.getLastPoint();
   float startYaw = circuitF1.getSpawnYaw();
   circuitF1.setupCircuit();
 
@@ -48,7 +56,7 @@ void setup() {
   car1 = new Car(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\mainCar\\insideCar.obj");
   vehicles.add(car1);
   
-  Police car2 = new Police(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\PoliceCar.obj");
+  car2 = new Police(this, startPos.x, startPos.y, startPos.z, startYaw, "..\\resources\\PoliceCar.obj");
   vehicles.add(car2);
   car2.toggleBounce();
   
@@ -56,7 +64,7 @@ void setup() {
   camera = new Camera(car1);
   gui = new GUI(car1);
 
-  // banner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/finish/BannerStartEnd.obj");
+  // props
   startBanner = new Props(this, startPos.x, startPos.y-1, startPos.z, 20, "../resources/startBanner/1startBanner.obj");
 
   // minimap
@@ -90,20 +98,18 @@ void draw() {
   circuitF1.lightCircuit(isNight);
   circuitF1.display();
 
-  // Reset collision sounds and update vehicles
   for(Vehicle v : vehicles) {
     if(v instanceof Car) {
       ((Car)v).resetCollisionSound();
     } else if(v instanceof Police) {
       ((Police)v).resetCollisionSound();
     }
+
     v.update(circuitF1);
     v.checkAllVehicleCollisions(vehicles);
     v.fenceCollision(circuitF1.getFenceBoundaries());
-    // v.checkBannerCollision(startPos);
     v.display();
   }
-  
   
   startBanner.drawBanner();
   popMatrix();
@@ -111,12 +117,10 @@ void draw() {
   minimap.drawCarsMap(-100, -100, isNight, car1, vehicles);
   gui.drawGUI();
 
-  // ca c'est le gpt qui m'a fait/expliqué mais je comprends ducoup c'est pas mal
   fog.set("u_time", millis() / 1000.0);
   fog.set("u_resolution", (float)width, (float)height);
   fog.set("u_nightMode", isNight ? 0.5 : 0.0);
-
-filter(fog);
+  filter(fog);
 }
 
 // toggle

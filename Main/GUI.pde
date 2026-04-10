@@ -20,17 +20,17 @@ class GUI {
     mapX = width - 200;
     mapY = -100;
 
-    PVector spawnPoint = new PVector(-500, 100, -1000); 
+    PVector spawnPoint = new PVector(-500, 100, -1000);
     float distToStart = dist(car.pos.x, car.pos.z, spawnPoint.x, spawnPoint.z);
-    
-    if(distToStart > startThreshold && !farAway) {
+
+    if (distToStart > startThreshold && !farAway) {
       farAway = true;
     }
-    
-    if(farAway && distToStart < startThreshold) {
+
+    if (farAway && distToStart < startThreshold) {
       lastLapTime = millis() - lapStartTime;
-      lapStartTime = millis(); 
-      farAway = false; 
+      lapStartTime = millis();
+      farAway = false;
     }
 
     int currentLapTime = millis() - lapStartTime;
@@ -57,7 +57,7 @@ class GUI {
     guiGraphic.rect(bx, by, barWidth, barHeight);
 
     float fillWidth = map(car.boostCooldown, 0.0, 20.0, 0.0, barWidth);
-    if(car.boostCooldown > 0.5) {
+    if (car.boostCooldown > 0.5) {
       guiGraphic.fill(0, 200, 255);
     } else {
       guiGraphic.fill(100, 100, 100);
@@ -71,8 +71,8 @@ class GUI {
     guiGraphic.textSize(22);
     String lapTimeStr = formatTime(currentLapTime);
     guiGraphic.text("Lap: " + lapTimeStr, 10, 100);
-    
-    if(lastLapTime > 0) {
+
+    if (lastLapTime > 0) {
       String lastLapStr = formatTime(lastLapTime);
       guiGraphic.text("Last: " + lastLapStr, 10, 130);
     }
@@ -90,7 +90,7 @@ class GUI {
     int minutes = totalSeconds / 60;
     int seconds = totalSeconds % 60;
     int ms = milliseconds % 1000;
-    
+
     return nf(minutes, 2) + ":" + nf(seconds, 2) + ":" + nf(ms, 3);
   }
 }
